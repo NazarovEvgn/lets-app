@@ -38,7 +38,9 @@ class Business(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     name: Mapped[str] = mapped_column(String(255), index=True)
-    type: Mapped[BusinessType] = mapped_column(SQLEnum(BusinessType))
+    type: Mapped[BusinessType] = mapped_column(
+        SQLEnum(BusinessType, values_callable=lambda x: [e.value for e in x])
+    )
     address: Mapped[str] = mapped_column(String(500))
     lat: Mapped[float] = mapped_column(Float)
     lon: Mapped[float] = mapped_column(Float)
@@ -48,7 +50,8 @@ class Business(Base):
     logo_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     dgis_id: Mapped[str | None] = mapped_column(String(100), nullable=True, index=True)
     subscription_status: Mapped[SubscriptionStatus] = mapped_column(
-        SQLEnum(SubscriptionStatus), default=SubscriptionStatus.TRIAL
+        SQLEnum(SubscriptionStatus, values_callable=lambda x: [e.value for e in x]),
+        default=SubscriptionStatus.TRIAL,
     )
     subscription_end_date: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
@@ -106,7 +109,8 @@ class BusinessStatus(Base):
         ForeignKey("businesses.id"), unique=True, index=True
     )
     status: Mapped[AvailabilityStatus] = mapped_column(
-        SQLEnum(AvailabilityStatus), default=AvailabilityStatus.AVAILABLE
+        SQLEnum(AvailabilityStatus, values_callable=lambda x: [e.value for e in x]),
+        default=AvailabilityStatus.AVAILABLE,
     )
     estimated_wait_minutes: Mapped[int] = mapped_column(Integer, default=0)
     current_queue_count: Mapped[int] = mapped_column(Integer, default=0)
@@ -128,7 +132,9 @@ class StatusHistory(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     business_id: Mapped[int] = mapped_column(ForeignKey("businesses.id"), index=True)
-    status: Mapped[AvailabilityStatus] = mapped_column(SQLEnum(AvailabilityStatus))
+    status: Mapped[AvailabilityStatus] = mapped_column(
+        SQLEnum(AvailabilityStatus, values_callable=lambda x: [e.value for e in x])
+    )
     estimated_wait_minutes: Mapped[int] = mapped_column(Integer)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
 

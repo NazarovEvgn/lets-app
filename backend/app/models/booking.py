@@ -27,7 +27,9 @@ class Booking(Base):
     booking_date: Mapped[date] = mapped_column(Date, index=True)
     booking_time: Mapped[time] = mapped_column(Time)
     status: Mapped[BookingStatus] = mapped_column(
-        SQLEnum(BookingStatus), default=BookingStatus.PENDING, index=True
+        SQLEnum(BookingStatus, values_callable=lambda x: [e.value for e in x]),
+        default=BookingStatus.PENDING,
+        index=True,
     )
     client_name: Mapped[str] = mapped_column(String(255))
     client_phone: Mapped[str] = mapped_column(String(20))

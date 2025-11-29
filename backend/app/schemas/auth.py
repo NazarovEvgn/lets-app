@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr
+from app.models.business import BusinessType
 
 
 class Token(BaseModel):
@@ -47,7 +48,7 @@ class BusinessAdminRegister(BaseModel):
 
     # Business data
     business_name: str
-    business_type: str
+    business_type: BusinessType
     address: str
     lat: float
     lon: float

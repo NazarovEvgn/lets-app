@@ -19,11 +19,7 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    # Create ENUM types
-    op.execute("CREATE TYPE businesstype AS ENUM ('car_wash', 'repair_shop', 'tire_service')")
-    op.execute("CREATE TYPE subscriptionstatus AS ENUM ('trial', 'active', 'expired', 'cancelled')")
-    op.execute("CREATE TYPE availabilitystatus AS ENUM ('available', 'busy', 'very_busy')")
-    op.execute("CREATE TYPE bookingstatus AS ENUM ('pending', 'confirmed', 'completed', 'cancelled')")
+    # ENUM types will be created automatically by SQLAlchemy when creating tables
 
     # Users table
     op.create_table('users',
