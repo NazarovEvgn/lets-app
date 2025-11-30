@@ -107,6 +107,13 @@
         </q-card>
       </div>
     </div>
+
+    <!-- Booking Dialog -->
+    <BookingDialog
+      v-model="showBookingDialog"
+      :business="businessToBook"
+      @booking-created="onBookingCreated"
+    />
   </div>
 </template>
 
@@ -114,9 +121,14 @@
 import { defineComponent, ref, onMounted, onBeforeUnmount } from 'vue'
 import { useQuasar } from 'quasar'
 import { api } from 'boot/axios'
+import BookingDialog from 'components/BookingDialog.vue'
 
 export default defineComponent({
   name: 'MapPage',
+
+  components: {
+    BookingDialog
+  },
 
   setup() {
     const $q = useQuasar()
@@ -128,6 +140,10 @@ export default defineComponent({
     const favoritesCount = ref(0)
     const businesses = ref([]) // Список бизнесов
     const markers = ref([]) // Маркеры на карте
+
+    // Booking dialog state
+    const showBookingDialog = ref(false)
+    const businessToBook = ref(null)
 
     const selectType = (type) => {
       if (selectedType.value === type) {
@@ -170,11 +186,13 @@ export default defineComponent({
     }
 
     const bookService = (business) => {
-      $q.notify({
-        type: 'info',
-        message: 'Форма записи будет реализована на следующем этапе'
-      })
-      console.log('Book service at:', business.name)
+      businessToBook.value = business
+      showBookingDialog.value = true
+    }
+
+    const onBookingCreated = (booking) => {
+      console.log('Booking created:', booking)
+      // Refresh bookings or update UI if needed
     }
 
     // Загрузка бизнесов из API
@@ -343,7 +361,10 @@ export default defineComponent({
       statusLabel,
       statusColor,
       call,
-      bookService
+      bookService,
+      showBookingDialog,
+      businessToBook,
+      onBookingCreated
     }
   }
 })
