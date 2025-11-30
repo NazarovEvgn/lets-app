@@ -43,10 +43,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ✅ **Fixed**: LoginPage uses direct API calls to avoid Pinia initialization timing issues
 - ✅ **Fixed**: CORS configured for multiple dev server ports (9000, 9001, 9002, 3000)
 
-**Next steps (Phase 4):**
+**Phase 4 (In Progress):** Client PWA Application
+- ✅ **Quasar PWA project created** (client-app/) - http://localhost:9000
+  - ✅ Project structure with pages, routing, axios configured
+  - ✅ MapPage with filter panel and business card UI
+  - ✅ FavoritesPage and ErrorNotFound pages
+  - ✅ PWA manifest and service worker setup
+  - 🔄 **Current:** 2GIS map integration (branch: feature/2gis-map-integration)
+- 🔄 2GIS map display with custom markers
+- 🔄 Load and display businesses on map
+- 🔄 Business card with detailed information
+- 🔄 Online booking form (no registration required)
+- 🔄 Favorites functionality (localStorage)
+
+**Future tasks:**
 - Implement remaining admin pages (Promotions CRUD, Analytics dashboard, Profile settings)
-- Setup Quasar Client PWA project with 2GIS map integration
-- WebSocket for real-time status updates (deferred from Phase 2)
+- WebSocket for real-time status updates
 - Production deployment preparation
 
 ## Project Overview
