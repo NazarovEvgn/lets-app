@@ -20,7 +20,11 @@ def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
 
-def create_access_token(subject: str | Any, expires_delta: timedelta | None = None) -> str:
+def create_access_token(
+    subject: str | Any,
+    expires_delta: timedelta | None = None,
+    user_type: str | None = None
+) -> str:
     """Create JWT access token."""
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
@@ -30,6 +34,9 @@ def create_access_token(subject: str | Any, expires_delta: timedelta | None = No
         )
 
     to_encode = {"exp": expire, "sub": str(subject), "type": "access"}
+    if user_type:
+        to_encode["user_type"] = user_type
+
     encoded_jwt = jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
     return encoded_jwt
 

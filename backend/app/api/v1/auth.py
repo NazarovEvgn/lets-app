@@ -110,7 +110,7 @@ async def register_business(
     await db.refresh(new_admin)
 
     # Create tokens with user_type flag
-    access_token = create_access_token(subject=new_admin.id)
+    access_token = create_access_token(subject=new_admin.id, user_type="business_admin")
     refresh_token = create_refresh_token(subject=new_admin.id)
 
     return Token(access_token=access_token, refresh_token=refresh_token)
@@ -154,7 +154,7 @@ async def login_business_admin(
         )
 
     # Create tokens with user_type flag
-    access_token = create_access_token(subject=admin.id)
+    access_token = create_access_token(subject=admin.id, user_type="business_admin")
     refresh_token = create_refresh_token(subject=admin.id)
 
     return Token(access_token=access_token, refresh_token=refresh_token)

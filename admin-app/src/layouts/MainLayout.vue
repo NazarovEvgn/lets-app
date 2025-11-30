@@ -103,15 +103,16 @@ export default defineComponent({
   setup() {
     const $q = useQuasar()
     const router = useRouter()
-    let authStore = null
-    try {
-      authStore = useAuthStore()
-    } catch (e) {
-      console.warn('AuthStore not ready:', e)
-    }
     const leftDrawerOpen = ref(false)
 
-    const businessName = computed(() => authStore?.businessName || 'Админ панель')
+    const businessName = computed(() => {
+      try {
+        const authStore = useAuthStore()
+        return authStore.businessName || 'Админ панель'
+      } catch (e) {
+        return 'Админ панель'
+      }
+    })
 
     const toggleLeftDrawer = () => {
       leftDrawerOpen.value = !leftDrawerOpen.value
@@ -124,8 +125,11 @@ export default defineComponent({
         cancel: true,
         persistent: true
       }).onOk(() => {
-        if (authStore) {
+        try {
+          const authStore = useAuthStore()
           authStore.logout()
+        } catch (e) {
+          console.warn('Logout error:', e)
         }
         router.push({ name: 'login' })
       })

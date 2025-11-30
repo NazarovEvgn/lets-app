@@ -1,5 +1,5 @@
 <template>
-  <q-page class="flex flex-center bg-grey-2">
+  <div class="flex flex-center bg-grey-2" style="height: 100vh;">
     <q-card class="login-card">
       <q-card-section class="text-center">
         <div class="text-h4 text-primary q-mb-md">👍 ХичХайк</div>
@@ -60,13 +60,12 @@
         </div>
       </q-card-section>
     </q-card>
-  </q-page>
+  </div>
 </template>
 
 <script>
 import { defineComponent, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '../stores/auth'
 import { useQuasar } from 'quasar'
 
 export default defineComponent({
@@ -75,7 +74,6 @@ export default defineComponent({
   setup() {
     const $q = useQuasar()
     const router = useRouter()
-    const authStore = useAuthStore()
 
     const email = ref('')
     const password = ref('')
@@ -86,20 +84,31 @@ export default defineComponent({
     const handleLogin = async () => {
       loading.value = true
 
-      const result = await authStore.login(email.value, password.value)
+      try {
+        // Direct API call to avoid Pinia issues
+        const { api } = await import('../boot/axios')
+        const response = await api.post('/auth/login/business', {
+          email: email.value,
+          password: password.value
+        })
 
-      loading.value = false
+        const { access_token, refresh_token } = response.data
+        localStorage.setItem('accessToken', access_token)
+        localStorage.setItem('refreshToken', refresh_token)
 
-      if (result.success) {
+        loading.value = false
+
         $q.notify({
           type: 'positive',
           message: 'Успешный вход!'
         })
+
         router.push({ name: 'home' })
-      } else {
+      } catch (error) {
+        loading.value = false
         $q.notify({
           type: 'negative',
-          message: result.error
+          message: error.response?.data?.detail || 'Ошибка входа'
         })
       }
     }

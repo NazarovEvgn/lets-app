@@ -6,12 +6,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **✅ Phase 1 Complete**: Backend infrastructure is implemented and database is ready.
 **✅ Phase 2 Complete**: Full REST API with all admin and client endpoints implemented.
+**✅ Phase 3 Complete**: Quasar Admin Panel with full authentication and core functionality tested.
 
 **What's implemented:**
 - ✅ FastAPI backend with uv package manager
 - ✅ PostgreSQL database with all tables created (Docker port: 5433)
 - ✅ SQLAlchemy 2.0 async models with proper Enum handling
-- ✅ JWT authentication (argon2 password hashing)
+- ✅ JWT authentication with user_type field (argon2 password hashing)
 - ✅ Pydantic validation schemas
 - ✅ Auth API endpoints (register/login for clients and business admins)
 - ✅ Admin API endpoints (35+ endpoints - profile, services, bookings, analytics, status updates)
@@ -20,16 +21,33 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ✅ Database migrations with proper Enum values
 - ✅ Redis integration prepared
 - ✅ API documentation (see docs/api_endpoints.md)
+- ✅ **Quasar Admin Panel** (admin-app/) - **FULLY WORKING**
+  - ✅ Login page with JWT authentication (direct API calls)
+  - ✅ Main layout with navigation (7 pages)
+  - ✅ Dashboard with quick actions
+  - ✅ Status update page (PRIMARY FEATURE) - fully functional
+  - ✅ **Services page** - CRUD operations tested (create, edit, delete, toggle active)
+  - ✅ **Bookings page** - Status management tested (view, filter, update status)
+  - 🔄 Placeholder pages: Promotions, Analytics, Profile
+  - ✅ Pinia store for auth state management
+  - ✅ Axios with automatic JWT token refresh
+  - ✅ Tilda Sans fonts integrated (all weights)
+  - ✅ Running on http://localhost:9002
+  - ✅ **Test account**: admin@testcarwash.ru / Test123456
 
 **Known Issues & Solutions:**
 - ⚠️ **PostgreSQL Port Conflict**: If you have local PostgreSQL 17 installed, Docker uses port 5433 instead of 5432
 - ✅ **Fixed**: Enum values now use lowercase (car_wash, not CAR_WASH) via `values_callable`
 - ✅ **Fixed**: Password hashing switched from bcrypt to argon2-cffi for better compatibility
+- ✅ **Fixed**: JWT tokens now include `user_type` field for business_admin authentication
+- ✅ **Fixed**: LoginPage uses direct API calls to avoid Pinia initialization timing issues
+- ✅ **Fixed**: CORS configured for multiple dev server ports (9000, 9001, 9002, 3000)
 
-**Next steps (Phase 3):**
-- Setup Quasar Admin Panel project
-- Implement admin dashboard UI
-- WebSocket for real-time updates (deferred from Phase 2)
+**Next steps (Phase 4):**
+- Implement remaining admin pages (Promotions CRUD, Analytics dashboard, Profile settings)
+- Setup Quasar Client PWA project with 2GIS map integration
+- WebSocket for real-time status updates (deferred from Phase 2)
+- Production deployment preparation
 
 ## Project Overview
 
@@ -219,9 +237,28 @@ black .        # Format
 - API documentation available at: http://localhost:8000/docs
 
 ### Frontend (Quasar)
+
+**Admin Panel** (running on http://localhost:9001):
 ```bash
 # Setup
-cd client-app  # or admin-app
+cd admin-app
+npm install
+
+# Development
+npm run dev                            # Run dev server (default: http://localhost:9001)
+
+# Build
+quasar build -m pwa                    # Build for production
+
+# Code quality
+npm run lint                           # Lint
+npm run format                         # Format
+```
+
+**Client PWA** (to be implemented):
+```bash
+# Setup
+cd client-app
 npm install
 
 # Development
@@ -230,10 +267,6 @@ quasar dev                             # Run dev server (SPA mode, faster)
 
 # Build
 quasar build -m pwa                    # Build for production
-
-# Code quality
-npm run lint                           # Lint
-npm run format                         # Format
 ```
 
 ### Database
@@ -246,42 +279,61 @@ psql hitchhike_db                      # Connect to database
 
 ```
 hitchhike/
-├── backend/              # FastAPI application
+├── backend/              # FastAPI application (http://localhost:8000)
 │   ├── app/
-│   │   ├── api/v1/      # API endpoints
+│   │   ├── api/v1/      # API endpoints (auth, admin, client)
 │   │   ├── models/      # SQLAlchemy models
 │   │   ├── schemas/     # Pydantic schemas
 │   │   ├── services/    # Business logic
-│   │   └── core/        # Core utilities (auth, DB)
+│   │   └── core/        # Core utilities (auth, DB, config)
 │   ├── alembic/         # Database migrations
-│   └── tests/           # Tests
+│   └── tests/           # Tests (to be implemented)
 │
-├── client-app/          # Quasar PWA (client application)
+├── admin-app/           # ✅ Quasar Admin Panel (http://localhost:9001)
 │   ├── src/
-│   │   ├── pages/       # Vue pages
-│   │   ├── components/  # Vue components
-│   │   ├── stores/      # Pinia stores
-│   │   └── services/    # API calls
-│   └── src-pwa/         # PWA configuration
+│   │   ├── pages/       # Vue pages (Login, Dashboard, Status, etc.)
+│   │   ├── layouts/     # MainLayout with navigation
+│   │   ├── stores/      # Pinia stores (auth)
+│   │   ├── boot/        # Axios configuration with JWT
+│   │   ├── router/      # Vue Router with auth guards
+│   │   └── css/         # Styles (Tilda Sans fonts)
+│   ├── public/fonts/    # Tilda Sans font files
+│   └── quasar.config.js # Quasar configuration
 │
-├── admin-app/           # Quasar PWA (admin panel)
-│   └── (same structure as client-app)
+├── client-app/          # 🔄 Quasar PWA (to be implemented)
+│   └── (similar structure to admin-app)
+│
+├── fonts/               # Source font files (Tilda Sans)
 │
 └── docs/
     ├── dev_concept.md   # Business concept (Russian)
-    └── dev_plan.md      # Development plan (Russian)
+    ├── dev_plan.md      # Development plan (Russian)
+    └── api_endpoints.md # API documentation
 ```
 
 See **docs/dev_plan.md** for detailed technical stack, architecture, and development workflow.
 
 ## Key Implementation Notes
 
-**2GIS Maps Integration:**
+**Admin Panel (admin-app/):**
+- **Framework:** Quasar 2.x with Vue 3 Composition API
+- **Authentication:** JWT with automatic token refresh via Axios interceptors
+- **State Management:** Pinia store for auth state
+- **Routing:** Protected routes with navigation guards (requires Pinia initialized first)
+- **Fonts:** Tilda Sans with all weight variations (Light to Black + Variable Font)
+- **Development Server:** http://localhost:9001
+- **Key Pages:**
+  - LoginPage - JWT authentication
+  - DashboardPage - Quick actions and overview
+  - StatusPage - PRIMARY FEATURE for updating business availability
+  - Services/Bookings/Promotions/Analytics/Profile - Placeholder pages
+
+**2GIS Maps Integration (to be implemented in client-app):**
 - Frontend: 2GIS JavaScript API 3.0 (`@2gis/mapgl`)
 - Custom markers: 👍 thumbs up icon with color-coded availability
 - Color scheme: Green (available), Yellow (busy), Orange (very busy)
 
-**Real-time Updates:**
+**Real-time Updates (to be implemented):**
 - FastAPI WebSocket endpoints for status updates
 - Client subscribes to business status changes
 - Admin receives notifications for new bookings
@@ -295,6 +347,8 @@ See **docs/dev_plan.md** for detailed technical stack, architecture, and develop
 - JWT tokens (access + refresh)
 - Separate auth flows for clients and business admins
 - Password hashing with argon2 (more secure and compatible than bcrypt)
+- Token storage in localStorage
+- Automatic refresh on 401 errors
 
 ## Environment Variables
 

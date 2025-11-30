@@ -15,7 +15,6 @@ import './css/app.scss'
 import App from './App.vue'
 import router from './router'
 import axios from './boot/axios'
-import { useAuthStore } from './stores/auth'
 
 const app = createApp(App)
 
@@ -29,22 +28,22 @@ app.use(Quasar, {
 
 const pinia = createPinia()
 app.use(pinia)
+app.use(router)
 
-// Setup router guards after Pinia is initialized
+// Setup router guards AFTER app is fully configured
 router.beforeEach((to, from, next) => {
-  const authStore = useAuthStore()
+  // Check authentication via localStorage directly to avoid Pinia timing issues
+  const hasToken = !!localStorage.getItem('accessToken')
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
 
-  if (requiresAuth && !authStore.isAuthenticated) {
+  if (requiresAuth && !hasToken) {
     next({ name: 'login' })
-  } else if (to.name === 'login' && authStore.isAuthenticated) {
+  } else if (to.name === 'login' && hasToken) {
     next({ name: 'home' })
   } else {
     next()
   }
 })
-
-app.use(router)
 
 // Boot axios
 axios({ app })
