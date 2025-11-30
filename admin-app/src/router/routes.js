@@ -25,11 +25,6 @@ const routes = [
         component: () => import('../pages/BookingsPage.vue')
       },
       {
-        path: 'promotions',
-        name: 'promotions',
-        component: () => import('../pages/PromotionsPage.vue')
-      },
-      {
         path: 'analytics',
         name: 'analytics',
         component: () => import('../pages/AnalyticsPage.vue')

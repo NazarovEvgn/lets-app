@@ -1,11 +1,11 @@
 <template>
   <q-layout view="hHh lpR fFf">
-    <q-header elevated class="bg-primary text-white">
+    <q-header elevated class="bg-dark text-white">
       <q-toolbar>
         <q-btn dense flat round icon="menu" @click="toggleLeftDrawer" />
 
         <q-toolbar-title>
-          👍 ХичХайк - {{ businessName }}
+          {{ businessName }}
         </q-toolbar-title>
 
         <q-btn flat round dense icon="logout" @click="handleLogout">
@@ -42,15 +42,6 @@
           </q-item-section>
           <q-item-section>
             <q-item-label>Услуги</q-item-label>
-          </q-item-section>
-        </q-item>
-
-        <q-item clickable :to="{ name: 'promotions' }">
-          <q-item-section avatar>
-            <q-icon name="local_offer" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>Акции</q-item-label>
           </q-item-section>
         </q-item>
 

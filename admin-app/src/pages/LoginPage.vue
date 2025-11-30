@@ -2,8 +2,7 @@
   <div class="flex flex-center bg-grey-2" style="height: 100vh;">
     <q-card class="login-card">
       <q-card-section class="text-center">
-        <div class="text-h4 text-primary q-mb-md">👍 ХичХайк</div>
-        <div class="text-h6">Вход в админ-панель</div>
+        <div class="text-h5">Вход в админ-панель</div>
       </q-card-section>
 
       <q-card-section>

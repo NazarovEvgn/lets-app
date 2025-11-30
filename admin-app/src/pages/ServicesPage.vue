@@ -1,7 +1,7 @@
 <template>
   <q-page padding>
     <div class="row items-center justify-between q-mb-md">
-      <div class="text-h4">Управление услугами</div>
+      <div class="text-h4">Услуги</div>
       <q-btn color="primary" icon="add" label="Добавить услугу" @click="openCreateDialog" />
     </div>
 
@@ -14,6 +14,7 @@
           :loading="loading"
           flat
           bordered
+          :grid="$q.screen.lt.md"
         >
           <template v-slot:body-cell-is_active="props">
             <q-td :props="props">
@@ -60,6 +61,75 @@
                 <q-tooltip>Удалить</q-tooltip>
               </q-btn>
             </q-td>
+          </template>
+
+          <!-- Grid mode для мобильных устройств -->
+          <template v-slot:item="props">
+            <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4">
+              <q-card>
+                <q-card-section>
+                  <div class="row items-center q-mb-sm">
+                    <div class="col">
+                      <div class="text-subtitle1 text-weight-medium">
+                        {{ props.row.name }}
+                      </div>
+                      <div class="text-caption text-grey-7" v-if="props.row.description">
+                        {{ props.row.description }}
+                      </div>
+                    </div>
+                    <div class="col-auto">
+                      <q-toggle
+                        :model-value="props.row.is_active"
+                        @update:model-value="toggleServiceActive(props.row)"
+                        color="positive"
+                      />
+                    </div>
+                  </div>
+
+                  <q-separator class="q-my-sm" />
+
+                  <div class="text-body2">
+                    <div class="row q-mb-xs">
+                      <div class="col-5 text-grey-7">Цена:</div>
+                      <div class="col-7 text-weight-medium">{{ formatPrice(props.row.price) }}</div>
+                    </div>
+                    <div class="row q-mb-xs">
+                      <div class="col-5 text-grey-7">Длительность:</div>
+                      <div class="col-7">{{ props.row.duration_minutes }} мин</div>
+                    </div>
+                    <div class="row q-mb-xs">
+                      <div class="col-5 text-grey-7">Статус:</div>
+                      <div class="col-7">
+                        <q-badge :color="props.row.is_active ? 'positive' : 'grey'">
+                          {{ props.row.is_active ? 'Активна' : 'Неактивна' }}
+                        </q-badge>
+                      </div>
+                    </div>
+                  </div>
+                </q-card-section>
+
+                <q-separator />
+
+                <q-card-actions align="right">
+                  <q-btn
+                    flat
+                    dense
+                    icon="edit"
+                    color="primary"
+                    label="Изменить"
+                    @click="openEditDialog(props.row)"
+                  />
+                  <q-btn
+                    flat
+                    dense
+                    icon="delete"
+                    color="negative"
+                    label="Удалить"
+                    @click="confirmDelete(props.row)"
+                  />
+                </q-card-actions>
+              </q-card>
+            </div>
           </template>
         </q-table>
       </q-card-section>

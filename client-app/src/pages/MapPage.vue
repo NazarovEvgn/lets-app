@@ -69,9 +69,7 @@
                   :color="statusColor(selectedBusiness.status?.status || 'available')"
                   text-color="white"
                   class="q-ml-sm"
-                >
-                  {{ selectedBusiness.status?.status === 'available' ? '🟢' : selectedBusiness.status?.status === 'busy' ? '🟡' : '🟠' }}
-                </q-chip>
+                />
               </div>
               <div class="row items-center">
                 <q-icon name="location_on" class="q-mr-sm" />
@@ -256,7 +254,7 @@ export default defineComponent({
             justify-content: center;
             font-size: 22px;
             user-select: none;
-          " data-business-id="${business.id}">👍</div>
+          " data-business-id="${business.id}"></div>
         `
 
         console.log('Creating marker with color:', color, 'for status:', business.status?.status)
