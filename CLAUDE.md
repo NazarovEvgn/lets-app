@@ -43,20 +43,36 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ✅ **Fixed**: LoginPage uses direct API calls to avoid Pinia initialization timing issues
 - ✅ **Fixed**: CORS configured for multiple dev server ports (9000, 9001, 9002, 3000)
 
-**Phase 4 (In Progress):** Client PWA Application
-- ✅ **Quasar PWA project created** (client-app/) - http://localhost:9000
+**✅ Phase 4 Complete:** Client PWA Application - 2GIS Map Integration
+- ✅ **Quasar PWA project created** (client-app/) - http://localhost:9002
   - ✅ Project structure with pages, routing, axios configured
   - ✅ MapPage with filter panel and business card UI
   - ✅ FavoritesPage and ErrorNotFound pages
   - ✅ PWA manifest and service worker setup
-  - 🔄 **Current:** 2GIS map integration (branch: feature/2gis-map-integration)
-- 🔄 2GIS map display with custom markers
-- 🔄 Load and display businesses on map
-- 🔄 Business card with detailed information
-- 🔄 Online booking form (no registration required)
-- 🔄 Favorites functionality (localStorage)
+  - ✅ **2GIS MapGL integration** (branch: feature/2gis-map-integration)
+- ✅ **2GIS map display with custom HTML markers**
+  - ✅ Color-coded markers: 🟢 Green (available), 🟡 Orange (busy), 🔴 Red (very busy)
+  - ✅ Emoji thumbs-up (👍) markers for better visibility
+  - ✅ Custom marker styling with borders and shadows
+- ✅ **Load and display businesses from API** via `/businesses/nearby`
+  - ✅ Real-time status display (estimated wait time, queue count)
+  - ✅ Automatic map updates when businesses change
+- ✅ **Business card with detailed information**
+  - ✅ Click on marker to show business details
+  - ✅ Display: name, address, phone, status, wait time
+  - ✅ Action buttons: Call, Book (placeholder)
+- ✅ **Type filtering** (car wash/repair shop/tire service)
+  - ✅ Filter buttons hide/show markers by business type
+- ✅ **2GIS API key configuration** in quasar.config.js
+- ✅ **VPN troubleshooting documentation** added
+- ✅ **Real businesses added**: Автомойка Тура, Автомойка Пена (Tyumen)
+- ✅ **Precise geolocation** from 2GIS URLs (lat/lon extraction)
+- 🔄 Online booking form (placeholder - to be implemented)
+- 🔄 Favorites functionality (placeholder - to be implemented)
 
-**Future tasks:**
+**Phase 5 (Next):** Booking System & Additional Features
+- Online booking form (no registration required for clients)
+- Favorites functionality (localStorage)
 - Implement remaining admin pages (Promotions CRUD, Analytics dashboard, Profile settings)
 - WebSocket for real-time status updates
 - Production deployment preparation
