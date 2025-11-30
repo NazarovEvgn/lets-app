@@ -120,6 +120,7 @@ export default defineComponent({
   setup() {
     const $q = useQuasar()
     const mapContainer = ref(null)
+    const map = ref(null) // Экземпляр карты 2GIS
     const selectedType = ref(null)
     const selectedBusiness = ref(null)
     const favoritesCount = ref(0)
@@ -173,20 +174,42 @@ export default defineComponent({
       console.log('Book service at:', business.name)
     }
 
-    onMounted(() => {
-      // TODO: Инициализация 2GIS карты
-      console.log('MapPage mounted, map container:', mapContainer.value)
+    const initMap = async () => {
+      try {
+        // Динамический импорт 2GIS MapGL
+        const { load } = await import('@2gis/mapgl')
+        const mapglAPI = await load()
 
-      // Временная заглушка с тестовым бизнесом
-      setTimeout(() => {
-        selectedBusiness.value = {
-          name: 'Тестовая автомойка',
-          type: 'car_wash',
-          address: 'ул. Ленина, 10, Тюмень',
-          phone: '+79001234567',
-          status: 'available'
-        }
-      }, 1000)
+        // Создание карты с центром на Тюмени
+        map.value = new mapglAPI.Map(mapContainer.value, {
+          center: [65.5343, 57.1522], // Координаты Тюмени [lon, lat]
+          zoom: 12,
+          key: process.env.DGIS_API_KEY || 'your-2gis-api-key-here'
+        })
+
+        console.log('2GIS Map initialized successfully', map.value)
+
+        // Временная заглушка с тестовым бизнесом
+        setTimeout(() => {
+          selectedBusiness.value = {
+            name: 'Тестовая автомойка',
+            type: 'car_wash',
+            address: 'ул. Ленина, 10, Тюмень',
+            phone: '+79001234567',
+            status: 'available'
+          }
+        }, 2000)
+      } catch (error) {
+        console.error('Failed to initialize 2GIS map:', error)
+        $q.notify({
+          type: 'negative',
+          message: 'Не удалось загрузить карту. Проверьте подключение к интернету.'
+        })
+      }
+    }
+
+    onMounted(() => {
+      initMap()
     })
 
     return {
