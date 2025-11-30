@@ -1,11 +1,11 @@
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, and_
+from sqlalchemy import select, func, and_, delete
 
 from app.core.database import get_db
 from app.api.dependencies import get_current_business_admin
-from app.models.business import Business, BusinessAdmin, BusinessStatus, StatusHistory, AvailabilityStatus
+from app.models.business import Business, BusinessAdmin, BusinessStatus, StatusHistory, AvailabilityStatus, BusinessHours
 from app.models.service import Service
 from app.models.booking import Booking, BookingStatus
 from app.models.promotion import Promotion
@@ -13,6 +13,7 @@ from app.schemas.business import Business as BusinessSchema, BusinessUpdate, Bus
 from app.schemas.service import Service as ServiceSchema, ServiceCreate, ServiceUpdate
 from app.schemas.booking import Booking as BookingSchema, BookingUpdate
 from app.schemas.promotion import Promotion as PromotionSchema, PromotionCreate, PromotionUpdate
+from app.schemas.business_hours import BusinessHoursResponse, BusinessHoursBulkUpdate
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -521,3 +522,99 @@ async def get_analytics(
         "total_services": total_services,
         "active_promotions": active_promotions,
     }
+
+
+# =============================================================================
+# BUSINESS HOURS MANAGEMENT
+# =============================================================================
+
+@router.get("/business-hours", response_model=list[BusinessHoursResponse])
+async def get_business_hours(
+    current_admin: BusinessAdmin = Depends(get_current_business_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """Get business hours for current admin's business."""
+    result = await db.execute(
+        select(BusinessHours)
+        .where(BusinessHours.business_id == current_admin.business_id)
+        .order_by(BusinessHours.day_of_week)
+    )
+    hours = result.scalars().all()
+
+    # If no hours exist, create default (closed all week)
+    if not hours:
+        default_hours = []
+        for day in range(7):
+            hour = BusinessHours(
+                business_id=current_admin.business_id,
+                day_of_week=day,
+                is_closed=True,
+            )
+            db.add(hour)
+            default_hours.append(hour)
+
+        await db.commit()
+        for hour in default_hours:
+            await db.refresh(hour)
+        hours = default_hours
+
+    return hours
+
+
+@router.put("/business-hours", response_model=list[BusinessHoursResponse])
+async def update_business_hours(
+    hours_update: BusinessHoursBulkUpdate,
+    current_admin: BusinessAdmin = Depends(get_current_business_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """Update business hours (all 7 days at once)."""
+
+    # Validate that we have exactly 7 days
+    if len(hours_update.hours) != 7:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Must provide hours for all 7 days of the week",
+        )
+
+    # Validate day_of_week values
+    days = {h.day_of_week for h in hours_update.hours}
+    if days != {0, 1, 2, 3, 4, 5, 6}:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Must provide exactly one entry for each day (0-6)",
+        )
+
+    # Validate times (open_time < close_time)
+    for hour in hours_update.hours:
+        if not hour.is_closed and hour.open_time and hour.close_time:
+            if hour.open_time >= hour.close_time:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Opening time must be before closing time for day {hour.day_of_week}",
+                )
+
+    # Delete existing hours
+    await db.execute(
+        delete(BusinessHours).where(BusinessHours.business_id == current_admin.business_id)
+    )
+
+    # Create new hours
+    new_hours = []
+    for hour_data in hours_update.hours:
+        hour = BusinessHours(
+            business_id=current_admin.business_id,
+            day_of_week=hour_data.day_of_week,
+            open_time=hour_data.open_time,
+            close_time=hour_data.close_time,
+            is_closed=hour_data.is_closed,
+        )
+        db.add(hour)
+        new_hours.append(hour)
+
+    await db.commit()
+
+    # Refresh to get IDs
+    for hour in new_hours:
+        await db.refresh(hour)
+
+    return new_hours

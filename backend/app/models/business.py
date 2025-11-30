@@ -1,5 +1,5 @@
-from datetime import datetime
-from sqlalchemy import String, Float, DateTime, ForeignKey, Integer, Text, Enum as SQLEnum
+from datetime import datetime, time
+from sqlalchemy import String, Float, DateTime, ForeignKey, Integer, Text, Enum as SQLEnum, Time, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 import enum
 
@@ -72,6 +72,9 @@ class Business(Base):
     status_history: Mapped[list["StatusHistory"]] = relationship(
         "StatusHistory", back_populates="business", lazy="selectin"
     )
+    business_hours: Mapped[list["BusinessHours"]] = relationship(
+        "BusinessHours", back_populates="business", lazy="selectin"
+    )
     bookings: Mapped[list["Booking"]] = relationship(
         "Booking", back_populates="business", lazy="selectin"
     )
@@ -140,3 +143,23 @@ class StatusHistory(Base):
 
     # Relationships
     business: Mapped["Business"] = relationship("Business", back_populates="status_history")
+
+
+class BusinessHours(Base):
+    """Business working hours for each day of the week."""
+
+    __tablename__ = "business_hours"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    business_id: Mapped[int] = mapped_column(ForeignKey("businesses.id"), index=True)
+    day_of_week: Mapped[int] = mapped_column(Integer)  # 0=Monday, 6=Sunday
+    open_time: Mapped[time | None] = mapped_column(Time, nullable=True)
+    close_time: Mapped[time | None] = mapped_column(Time, nullable=True)
+    is_closed: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+    # Relationships
+    business: Mapped["Business"] = relationship("Business", back_populates="business_hours")
