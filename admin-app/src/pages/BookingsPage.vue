@@ -1,6 +1,6 @@
 <template>
   <q-page padding>
-    <div class="text-h4 q-mb-md">Управление бронированиями</div>
+    <div class="text-h4 q-mb-md">Онлайн-запись</div>
 
     <!-- Фильтры -->
     <q-card class="q-mb-md">

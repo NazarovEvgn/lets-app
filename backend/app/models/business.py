@@ -26,9 +26,8 @@ class SubscriptionStatus(str, enum.Enum):
 class AvailabilityStatus(str, enum.Enum):
     """Business availability status."""
 
-    AVAILABLE = "available"  # 0-15 min
-    BUSY = "busy"  # 15-30 min
-    VERY_BUSY = "very_busy"  # 30+ min
+    AVAILABLE = "available"  # Свободны. Готовы принять сразу
+    BUSY = "busy"  # Работаем (примерное время ожидания указывается отдельно)
 
 
 class Business(Base):
@@ -116,7 +115,6 @@ class BusinessStatus(Base):
         default=AvailabilityStatus.AVAILABLE,
     )
     estimated_wait_minutes: Mapped[int] = mapped_column(Integer, default=0)
-    current_queue_count: Mapped[int] = mapped_column(Integer, default=0)
     updated_by_admin_id: Mapped[int | None] = mapped_column(
         ForeignKey("business_admins.id"), nullable=True
     )

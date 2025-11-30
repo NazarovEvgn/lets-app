@@ -94,7 +94,6 @@ async def update_business_status(
         # Update existing status
         business_status.status = AvailabilityStatus(status_data.status)
         business_status.estimated_wait_minutes = status_data.estimated_wait_minutes
-        business_status.current_queue_count = status_data.current_queue_count
         business_status.updated_by_admin_id = current_admin.id
         business_status.updated_at = datetime.utcnow()
     else:
@@ -103,7 +102,6 @@ async def update_business_status(
             business_id=current_admin.business_id,
             status=AvailabilityStatus(status_data.status),
             estimated_wait_minutes=status_data.estimated_wait_minutes,
-            current_queue_count=status_data.current_queue_count,
             updated_by_admin_id=current_admin.id,
         )
         db.add(business_status)
@@ -141,14 +139,12 @@ async def get_current_status(
         return {
             "status": "available",
             "estimated_wait_minutes": 0,
-            "current_queue_count": 0,
             "updated_at": None,
         }
 
     return {
         "status": business_status.status.value,
         "estimated_wait_minutes": business_status.estimated_wait_minutes,
-        "current_queue_count": business_status.current_queue_count,
         "updated_at": business_status.updated_at,
     }
 

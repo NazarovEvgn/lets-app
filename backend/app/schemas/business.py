@@ -35,9 +35,8 @@ class BusinessUpdate(BaseModel):
 class BusinessStatusUpdate(BaseModel):
     """Business status update schema."""
 
-    status: str  # available, busy, very_busy
+    status: str  # available, busy
     estimated_wait_minutes: int = 0
-    current_queue_count: int = 0
 
 
 class Business(BusinessBase):

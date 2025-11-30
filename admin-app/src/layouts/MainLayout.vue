@@ -27,21 +27,12 @@
           </q-item-section>
         </q-item>
 
-        <q-item clickable :to="{ name: 'status' }">
-          <q-item-section avatar>
-            <q-icon name="schedule" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>Статус загруженности</q-item-label>
-          </q-item-section>
-        </q-item>
-
         <q-item clickable :to="{ name: 'bookings' }">
           <q-item-section avatar>
             <q-icon name="event" />
           </q-item-section>
           <q-item-section>
-            <q-item-label>Бронирования</q-item-label>
+            <q-item-label>Онлайн-запись</q-item-label>
           </q-item-section>
         </q-item>
 

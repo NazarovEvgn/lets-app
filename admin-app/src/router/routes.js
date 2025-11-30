@@ -15,11 +15,6 @@ const routes = [
         component: () => import('../pages/DashboardPage.vue')
       },
       {
-        path: 'status',
-        name: 'status',
-        component: () => import('../pages/StatusPage.vue')
-      },
-      {
         path: 'services',
         name: 'services',
         component: () => import('../pages/ServicesPage.vue')
@@ -43,6 +38,11 @@ const routes = [
         path: 'profile',
         name: 'profile',
         component: () => import('../pages/ProfilePage.vue')
+      },
+      {
+        path: 'business-hours',
+        name: 'business-hours',
+        component: () => import('../pages/BusinessHoursPage.vue')
       }
     ]
   },

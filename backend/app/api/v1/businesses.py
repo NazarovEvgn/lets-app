@@ -138,14 +138,12 @@ async def get_nearby_businesses(
             business_dict["status"] = {
                 "status": st.status.value,
                 "estimated_wait_minutes": st.estimated_wait_minutes,
-                "current_queue_count": st.current_queue_count,
                 "updated_at": st.updated_at,
             }
         else:
             business_dict["status"] = {
                 "status": "available",
                 "estimated_wait_minutes": 0,
-                "current_queue_count": 0,
                 "updated_at": None,
             }
 
@@ -211,9 +209,6 @@ async def get_business_details(
             "status": business_status.status.value if business_status else "available",
             "estimated_wait_minutes": (
                 business_status.estimated_wait_minutes if business_status else 0
-            ),
-            "current_queue_count": (
-                business_status.current_queue_count if business_status else 0
             ),
             "updated_at": business_status.updated_at if business_status else None,
         },
