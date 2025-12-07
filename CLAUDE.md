@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **✅ Phase 2 Complete**: Full REST API with all admin and client endpoints implemented.
 **✅ Phase 3 Complete**: Quasar Admin Panel with full authentication and core functionality tested.
 **✅ Phase 4 Complete**: Client PWA Application - 2GIS Map Integration
-**🔄 Phase 5 In Progress**: Migration to Ionic Framework + Tailwind CSS
+**🔄 Phase 5 Started**: Migration to Ionic Framework + Tailwind CSS (Ionic projects created)
 
 **What's implemented:**
 - ✅ FastAPI backend with uv package manager
@@ -42,28 +42,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - ✅ Axios with automatic JWT token refresh
   - ✅ Tilda Sans fonts integrated (all weights)
 
-**❌ CRITICAL ISSUE - Business Profile Not Loading in Header:**
-- **Problem**: After successful login, MainLayout header should display business name and address, but it shows empty values
-- **Root Cause**: Pinia store initialization timing issue - `useAuthStore()` called before Pinia is ready
-- **Attempts made**:
-  1. ❌ LoginPage.vue: Dynamic import + fetchProfile() → "getActivePinia() was called but there was no active Pinia" error
-  2. ❌ MainLayout.vue: onMounted() + fetchProfile() → Same Pinia error
-  3. ❌ router/index.js: beforeEach guard + fetchProfile() → No error in console, but `/api/v1/admin/business/profile` endpoint never called
-- **Backend Status**: `/api/v1/admin/business/profile` endpoint exists and works (tested manually returns correct data)
-- **Current State**:
-  - Login works ✅
-  - Dashboard loads ✅
-  - Status updates work ✅
-  - Bookings load ✅
-  - But authStore.business remains null → header shows empty strings
-- **Files affected**:
+**⚠️ Known Issue - Business Profile Not Loading in Header (Quasar Admin App):**
+- **Issue**: MainLayout header may not display business name and address after login
+- **Root Cause**: Pinia store initialization timing - fetchProfile() called before Pinia is ready
+- **Status**: Affects admin-app/ (Quasar), should be avoided in admin-ionic-app/ (Ionic)
+- **Workaround**: Fetch profile in onMounted() hook after component is fully initialized
+- **Backend Endpoint**: `/api/v1/admin/business/profile` (confirmed working)
+- **Files to review when fixing**:
   - `admin-app/src/pages/LoginPage.vue` (login logic)
-  - `admin-app/src/layouts/MainLayout.vue` (header display with businessName, businessAddress computed properties)
-  - `admin-app/src/stores/auth.js` (fetchProfile() method)
-  - `admin-app/src/router/index.js` (router guard with fetchProfile() call)
-  - `backend/app/api/v1/admin.py:25` (GET /admin/business/profile endpoint)
+  - `admin-app/src/layouts/MainLayout.vue` (header display)
+  - `admin-app/src/stores/auth.js` (fetchProfile method)
 
-**Known Issues & Solutions:**
+**Other Known Issues & Solutions:**
 - ⚠️ **PostgreSQL Port Conflict**: If you have local PostgreSQL 17 installed, Docker uses port 5433 instead of 5432
 - ✅ **Fixed**: Enum values now use lowercase (car_wash, not CAR_WASH) via `values_callable`
 - ✅ **Fixed**: Password hashing switched from bcrypt to argon2-cffi for better compatibility
@@ -125,7 +115,7 @@ Project successfully rebranded from "ХичХайк (HitchHike)" to "Lets"
 - familia.charkova@example.com / Familia123
 - hollywood.salon@example.com / Hollywood123
 
-**🔄 Phase 5 (In Progress):** Migration to Ionic Framework + Tailwind CSS
+**🔄 Phase 5 (Started):** Migration to Ionic Framework + Tailwind CSS
 
 **Decision rationale:**
 - Both admin and client apps will be used primarily on smartphones
@@ -133,34 +123,23 @@ Project successfully rebranded from "ХичХайк (HitchHike)" to "Lets"
 - Ionic Framework provides modern native mobile UX (iOS 17 / Material Design 3)
 - Tailwind CSS adds flexibility for custom components and brand styling
 
-**Migration plan:**
-1. **Create new Ionic projects** (admin-ionic-app/ and client-ionic-app/)
-   - Use Ionic CLI with Vue 3 template
-   - Install Tailwind CSS for custom styling
-   - Setup Capacitor for PWA + future native builds
-
-2. **Port backend integration**
-   - Copy Pinia stores (auth, business state)
-   - Setup Axios with JWT interceptors
-   - Configure API base URL and CORS
-
-3. **Rebuild UI with Ionic components + Tailwind**
-   - Use Ionic components for navigation, modals, cards, lists
-   - Use Tailwind for custom layouts, gradients, spacing
-   - Apply brand colors via CSS Variables + Tailwind config
-
-4. **Maintain feature parity**
-   - All existing features from Quasar apps
-   - Improved mobile UX with native iOS/Android styles
-   - Swipe gestures, pull-to-refresh, native animations
+**Current Status:**
+- ✅ Ionic projects created (admin-ionic-app/ and client-ionic-app/)
+- ✅ Tailwind CSS v4 installed and configured
+- ✅ Capacitor configured in client-ionic-app (PWA + native)
+- 🔄 Need to implement Feature-Based Architecture
+- 🔄 Need to port Pinia stores and Axios configuration
+- 🔄 Need to rebuild UI from Quasar apps
 
 **Technology stack:**
-- **Ionic Framework 7.x** - Native mobile components
-- **Vue 3 Composition API** - Same as current apps
-- **Tailwind CSS 3.x** - Utility-first styling
-- **Capacitor 5.x** - PWA + Native capabilities
-- **Pinia** - State management (same as current)
-- **Axios** - HTTP client with JWT (same as current)
+- **Ionic Framework 8.x** - Native mobile components
+- **Vue 3.3+ Composition API** - Same as current apps
+- **Tailwind CSS 4.x** - Utility-first styling
+- **Capacitor 7.x** - PWA + Native capabilities (client app only)
+- **TypeScript 5.9** - Type safety
+- **Vite 5.x** - Build tool
+- **Pinia** - State management (to be added)
+- **Axios** - HTTP client with JWT (to be added)
 
 **Architecture:** Feature-Based Architecture
 - Each business feature (auth, bookings, services, employees, business-status, profile) is a self-contained module
@@ -169,7 +148,7 @@ Project successfully rebranded from "ХичХайк (HitchHike)" to "Lets"
 - Core infrastructure (API, router, config) in `core/` directory
 - No Atomic Design - keeping it simple and pragmatic
 
-**Project structure:**
+**Target project structure:**
 ```
 admin-ionic-app/
 ├── src/
@@ -192,8 +171,6 @@ admin-ionic-app/
 │       ├── router/
 │       └── config/
 ```
-
-**Timeline estimate:** 2-3 days for both apps
 
 **Phase 6 (Next):** Additional Features & Production Deployment
 - Online booking form (no registration required for clients)
@@ -389,38 +366,53 @@ black .        # Format
 - Database schema is already created via manual migration in `alembic/versions/20251129_1220_initial_migration.py`
 - If you encounter asyncpg connection issues on Windows, the database can be managed directly via Docker exec
 - API documentation available at: http://localhost:8000/docs
+- When creating new migrations, always review autogenerated code for Enum handling
+- Use `uv run` prefix for all Python commands to ensure correct virtual environment
 
-### Frontend (Quasar)
+### Frontend (Quasar - Legacy)
 
-**Admin Panel** (running on http://localhost:9001):
+**Admin Panel (Quasar)** - http://localhost:9001:
 ```bash
-# Setup
 cd admin-app
 npm install
-
-# Development
-npm run dev                            # Run dev server (default: http://localhost:9001)
-
-# Build
-quasar build -m pwa                    # Build for production
-
-# Code quality
+npm run dev                            # Run dev server
 npm run lint                           # Lint
 npm run format                         # Format
+quasar build -m pwa                    # Build for production
 ```
 
-**Client PWA** (to be implemented):
+**Client PWA (Quasar)** - http://localhost:9002:
 ```bash
-# Setup
 cd client-app
 npm install
-
-# Development
-quasar dev -m pwa                      # Run dev server (PWA mode)
-quasar dev                             # Run dev server (SPA mode, faster)
-
-# Build
+npm run dev                            # Run dev server
 quasar build -m pwa                    # Build for production
+```
+
+### Frontend (Ionic - New)
+
+**Admin Ionic App** - http://localhost:5173 (default Vite port):
+```bash
+cd admin-ionic-app
+npm install
+npm run dev                            # Run dev server (Vite)
+npm run build                          # Build for production
+npm run lint                           # Lint
+npm run test:unit                      # Run unit tests (Vitest)
+npm run test:e2e                       # Run E2E tests (Cypress)
+```
+
+**Client Ionic App** - http://localhost:5173 (default Vite port):
+```bash
+cd client-ionic-app
+npm install
+npm run dev                            # Run dev server (Vite)
+npm run build                          # Build for production
+
+# Capacitor (PWA + Native)
+npx cap sync                           # Sync web assets to native platforms
+npx cap open ios                       # Open iOS project in Xcode
+npx cap open android                   # Open Android project in Android Studio
 ```
 
 ### Database
@@ -433,43 +425,86 @@ psql lets_db                           # Connect to database
 
 ```
 lets-app/
-├── backend/              # FastAPI application (http://localhost:8000)
+├── backend/                    # FastAPI application (http://localhost:8000)
 │   ├── app/
-│   │   ├── api/v1/      # API endpoints (auth, admin, client)
-│   │   ├── models/      # SQLAlchemy models
-│   │   ├── schemas/     # Pydantic schemas
-│   │   ├── services/    # Business logic
-│   │   └── core/        # Core utilities (auth, DB, config)
-│   ├── alembic/         # Database migrations
-│   └── tests/           # Tests (to be implemented)
+│   │   ├── api/v1/            # API endpoints
+│   │   │   ├── auth.py        # Auth endpoints (register/login for clients and admins)
+│   │   │   ├── admin.py       # Admin endpoints (profile, services, bookings, status)
+│   │   │   ├── businesses.py  # Client endpoints (browse businesses, nearby search)
+│   │   │   ├── bookings.py    # Booking management
+│   │   │   └── favorites.py   # Favorites management
+│   │   ├── models/            # SQLAlchemy 2.0 async models
+│   │   ├── schemas/           # Pydantic validation schemas
+│   │   ├── services/          # Business logic
+│   │   └── core/              # Core utilities (auth, DB, config)
+│   ├── alembic/               # Database migrations
+│   └── tests/                 # Tests (to be implemented)
 │
-├── admin-app/           # ✅ Quasar Admin Panel (http://localhost:9001)
+├── admin-app/                 # ✅ Quasar Admin Panel (http://localhost:9001) - LEGACY
 │   ├── src/
-│   │   ├── pages/       # Vue pages (Login, Dashboard, Status, etc.)
-│   │   ├── layouts/     # MainLayout with navigation
-│   │   ├── stores/      # Pinia stores (auth)
-│   │   ├── boot/        # Axios configuration with JWT
-│   │   ├── router/      # Vue Router with auth guards
-│   │   └── css/         # Styles (Tilda Sans fonts)
-│   ├── public/fonts/    # Tilda Sans font files
-│   └── quasar.config.js # Quasar configuration
+│   │   ├── pages/             # Vue pages (Login, Dashboard, Status, etc.)
+│   │   ├── layouts/           # MainLayout with navigation
+│   │   ├── stores/            # Pinia stores (auth)
+│   │   ├── boot/              # Axios configuration with JWT
+│   │   ├── router/            # Vue Router with auth guards
+│   │   └── css/               # Styles (Tilda Sans fonts)
+│   └── quasar.config.js       # Quasar configuration
 │
-├── client-app/          # 🔄 Quasar PWA (to be implemented)
-│   └── (similar structure to admin-app)
+├── client-app/                # ✅ Quasar Client PWA (http://localhost:9002) - LEGACY
+│   ├── src/
+│   │   ├── pages/             # MapPage, FavoritesPage
+│   │   ├── stores/            # Pinia stores
+│   │   ├── boot/              # Axios + 2GIS MapGL setup
+│   │   └── router/            # Vue Router
+│   └── quasar.config.js       # Quasar + 2GIS API key config
 │
-├── fonts/               # Source font files (Tilda Sans)
+├── admin-ionic-app/           # 🔄 Ionic Admin App (TypeScript + Vue 3 + Tailwind)
+│   ├── src/
+│   │   ├── views/             # Current: HomePage (placeholder)
+│   │   ├── router/            # Vue Router
+│   │   └── theme/             # Ionic CSS variables
+│   ├── vite.config.ts         # Vite configuration
+│   └── ionic.config.json      # Ionic CLI configuration
+│
+├── client-ionic-app/          # 🔄 Ionic Client App (TypeScript + Vue 3 + Tailwind + Capacitor)
+│   ├── src/
+│   │   ├── views/             # Current: HomePage (placeholder)
+│   │   ├── router/            # Vue Router
+│   │   └── theme/             # Ionic CSS variables + Tailwind
+│   ├── capacitor.config.ts    # Capacitor configuration (PWA + native)
+│   ├── vite.config.ts         # Vite configuration
+│   └── ionic.config.json      # Ionic CLI configuration
+│
+├── fonts/                     # Source font files (Tilda Sans)
 │
 └── docs/
-    ├── dev_concept.md   # Business concept (Russian)
-    ├── dev_plan.md      # Development plan (Russian)
-    └── api_endpoints.md # API documentation
+    ├── dev_concept.md         # Business concept (Russian)
+    ├── dev_plan.md            # Development plan (Russian)
+    └── api_endpoints.md       # API documentation
 ```
 
 See **docs/dev_plan.md** for detailed technical stack, architecture, and development workflow.
 
 ## Key Implementation Notes
 
-**Admin Panel (admin-app/):**
+**Backend API Architecture:**
+- **FastAPI** with async/await pattern throughout
+- **SQLAlchemy 2.0** with async engine (asyncpg driver)
+- **JWT Authentication** with separate flows for clients and business admins
+  - Token payload includes `user_type` field ("client" or "business_admin")
+  - Access tokens expire in 30 minutes, refresh tokens in 7 days
+- **Password Hashing:** argon2-cffi (switched from bcrypt for Windows compatibility)
+- **Database Enums:** Use lowercase values via `values_callable` (e.g., "car_wash" not "CAR_WASH")
+- **API Versioning:** All endpoints under `/api/v1/`
+- **CORS:** Configured for multiple dev server ports (9000, 9001, 9002, 3000, 5173)
+- **API Endpoints:**
+  - `/api/v1/auth/*` - Registration and login for clients and business admins
+  - `/api/v1/admin/*` - Business profile, services, bookings, status management (requires business_admin auth)
+  - `/api/v1/businesses/*` - Browse businesses, nearby search (public or client auth)
+  - `/api/v1/bookings/*` - Booking management
+  - `/api/v1/favorites/*` - Favorites management
+
+**Admin Panel (admin-app/ - Quasar):**
 - **Framework:** Quasar 2.x with Vue 3 Composition API
 - **Authentication:** JWT with automatic token refresh via Axios interceptors
 - **State Management:** Pinia store for auth state
@@ -534,6 +569,32 @@ ENVIRONMENT=development
 
 **Security Note**: Never commit `.env` file to Git. Always generate a new SECRET_KEY for production.
 
+## Brand Colors & Design System
+
+**Primary Colors:**
+- **Purple**: `#27126A` - Primary brand color (buttons, headers, markers)
+- **Green**: `#98EA14` - Accent color (availability indicator, success states)
+
+**Status Colors (Availability):**
+- 🟢 **Green** (#98EA14 or similar) - Available (0-15 min wait)
+- 🟡 **Yellow/Orange** - Busy (15-30 min wait)
+- 🔴 **Red** - Very busy (30+ min wait)
+
+**Map Markers:**
+- Base: Purple circle (#27126A)
+- Available indicator: Small green circle (#98EA14) on border
+- Icon: 👍 Thumbs up emoji
+
+**Typography:**
+- **Font Family**: Tilda Sans (all weights: Light to Black + Variable Font)
+- Located in: `fonts/` directory
+- Integrated in: admin-app/public/fonts/ and admin-app/src/css/
+
+**Ionic/Tailwind Configuration:**
+- Define CSS variables in `src/theme/variables.css` (Ionic)
+- Extend Tailwind config with brand colors
+- Use Ionic components for consistent mobile UX
+
 ## Language Notes
 
 - Primary documentation: Russian (docs/dev_concept.md, docs/dev_plan.md)
@@ -543,68 +604,68 @@ ENVIRONMENT=development
 
 ---
 
-## 🚀 NEXT SESSION INSTRUCTIONS (After Folder Rename)
+## Quick Start Guide
 
-**Current Status (December 6, 2025, 20:35):**
-- ✅ Rebranding complete (ХичХайк → Lets)
-- ✅ GitHub repository renamed to `lets-app`
-- ✅ Docker containers recreated (lets_postgres, lets_redis)
-- ✅ Database migrated and restored (lets_db)
-- ✅ Backend server running on new database
-- ⏸️ **SESSION PAUSED** - waiting for local folder rename
+**Starting the full stack:**
 
-**After you rename the folder C:\Projects\hitch_hike → C:\Projects\lets-app:**
-
-1. **Verify new location:**
+1. **Start Docker services (PostgreSQL + Redis):**
    ```bash
-   cd C:\Projects\lets-app
-   pwd  # Should show C:/Projects/lets-app
+   docker-compose up -d
+   docker ps  # Verify: lets_postgres (healthy), lets_redis (healthy)
    ```
 
-2. **Check git remote (should auto-update):**
+2. **Start backend API:**
    ```bash
-   git remote -v
-   # Should show: https://github.com/NazarovEvgn/lets-app.git
-   ```
-
-3. **Verify Docker containers are running:**
-   ```bash
-   docker ps
-   # Should see: lets_postgres (healthy), lets_redis (healthy)
-   ```
-
-4. **Start development servers:**
-   ```bash
-   # Backend
    cd backend
    uv run uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
-
-   # Admin panel (in new terminal)
-   cd admin-app
-   npm run dev  # http://localhost:9001
+   # API docs: http://localhost:8000/docs
    ```
 
-5. **Test login with credentials:**
-   - familia.mendeleeva@example.com / Familia123
-   - familia.charkova@example.com / Familia123
-   - hollywood.salon@example.com / Hollywood123
+3. **Start frontend (choose one):**
+   ```bash
+   # Option A: Quasar Admin Panel (legacy, fully functional)
+   cd admin-app
+   npm run dev  # http://localhost:9001
 
-**Next tasks - Ionic Migration:**
+   # Option B: Ionic Admin App (new, in development)
+   cd admin-ionic-app
+   npm run dev  # http://localhost:5173
+   ```
 
-Once you verify everything works after folder rename, we'll begin Phase 5:
+**Test credentials:**
+- familia.mendeleeva@example.com / Familia123
+- familia.charkova@example.com / Familia123
+- hollywood.salon@example.com / Hollywood123
 
-1. Install Ionic CLI: `npm install -g @ionic/cli`
-2. Create admin Ionic app: `ionic start lets-admin-ionic blank --type vue`
-3. Create client Ionic app: `ionic start lets-client-ionic blank --type vue`
-4. Setup Tailwind CSS in both apps
-5. Setup Capacitor for PWA
-6. Implement Feature-Based Architecture
-7. Port existing functionality from Quasar apps
-
-**Important files to remember:**
+**Important files:**
 - Database backup: `database_backup_20251206_203126.sql` (keep for safety)
-- Backend .env: Already updated with new credentials (not in git)
-- Docker compose: Already using new container names
-- Test accounts: 3 beauty salons with admin access
+- Backend .env: Contains DATABASE_URL, SECRET_KEY, DGIS_API_KEY (not in git)
+- Working directory: `C:\Projects\lets-app`
 
-**Current working directory after rename:** `C:\Projects\lets-app`
+---
+
+## Common Issues & Solutions
+
+**PostgreSQL Port Conflict:**
+- Docker PostgreSQL runs on port **5433** (not 5432) to avoid conflict with local PostgreSQL 17
+- Update DATABASE_URL in backend/.env: `postgresql+asyncpg://lets:lets@127.0.0.1:5433/lets_db`
+
+**Pinia Store Initialization Timing:**
+- Always ensure Pinia is created before accessing stores
+- In Quasar apps, use `boot` files for initialization
+- In Ionic apps, initialize in `main.ts` before mounting the app
+
+**2GIS Map Integration (Client App):**
+- Requires API key in quasar.config.js or environment variables
+- May require VPN if 2GIS services are blocked in your region
+- Custom HTML markers use emoji thumbs-up (👍) with color-coded borders
+
+**Alembic Migrations:**
+- Always use `uv run alembic` instead of plain `alembic`
+- Review autogenerated migrations for Enum handling (should use lowercase values)
+- Manual migration already exists - only create new ones for schema changes
+
+**Windows-Specific Issues:**
+- Use `127.0.0.1` instead of `localhost` for database connections
+- Use `.venv\Scripts\activate` (not `source .venv/bin/activate`)
+- argon2-cffi works better than bcrypt for password hashing on Windows
