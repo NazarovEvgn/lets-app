@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **✅ Phase 4 Complete**: Client PWA Application - 2GIS Map Integration
 **🔄 Phase 5 Started**: Migration to Ionic Framework + Tailwind CSS (Ionic projects created)
 
-**What's implemented:**
+**Backend (FastAPI):**
 - ✅ FastAPI backend with uv package manager
 - ✅ PostgreSQL database with all tables created (Docker port: 5433)
 - ✅ SQLAlchemy 2.0 async models with proper Enum handling
@@ -23,24 +23,41 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ✅ Database migrations with proper Enum values
 - ✅ Redis integration prepared
 - ✅ API documentation (see docs/api_endpoints.md)
-- ✅ **Database updated** with beauty salon businesses (BEAUTY_SALON type added)
+
+**Database:**
+- ✅ Test businesses added (BEAUTY_SALON, CAR_WASH types)
   - ✅ "Familia" (2 locations: Менделеева 137к1, Чаркова 56)
   - ✅ "Hollywood" (Тура 4/2)
-  - ✅ Test accounts: familia.mendeleeva@example.com / Familia123, familia.charkova@example.com / Familia123, hollywood.salon@example.com / Hollywood123
-- ✅ **Brand colors applied**: Purple #27126A (primary), Green #98EA14 (accent)
-  - ✅ Client app map markers: purple circles with green "available" indicator
-  - ✅ Admin panel Quasar variables configured
-- ✅ **Quasar Admin Panel** (admin-app/) - http://localhost:9001
-  - ✅ Login page with JWT authentication (direct API calls)
-  - ✅ Main layout with purple header (bg-primary)
-  - ✅ Dashboard redesigned per dev_plan.md (single toggle, compact layout)
-  - ✅ Status update page (PRIMARY FEATURE) - fully functional
-  - ✅ **Services page** - CRUD operations tested (create, edit, delete, toggle active)
-  - ✅ **Bookings page** - Status management tested (view, filter, update status)
-  - 🔄 Placeholder pages: Promotions, Analytics, Profile
-  - ✅ Pinia store for auth state management
+  - ✅ "Автомойка Тура", "Автомойка Пена" (Tyumen)
+- ✅ Test accounts: familia.mendeleeva@example.com / Familia123, familia.charkova@example.com / Familia123, hollywood.salon@example.com / Hollywood123
+
+**Frontend - Quasar (Legacy, fully functional):**
+- ✅ **Admin Panel** (admin-app/) - http://localhost:9001
+  - ✅ Login page with JWT authentication
+  - ✅ Dashboard with status toggle
+  - ✅ Status update page (PRIMARY FEATURE)
+  - ✅ Services page - CRUD operations
+  - ✅ Bookings page - Status management
+  - ✅ Pinia store for auth state
   - ✅ Axios with automatic JWT token refresh
-  - ✅ Tilda Sans fonts integrated (all weights)
+  - ✅ Tilda Sans fonts integrated
+- ✅ **Client PWA** (client-app/) - http://localhost:9002
+  - ✅ 2GIS MapGL integration with custom markers
+  - ✅ Color-coded availability markers (👍 emoji)
+  - ✅ Type filtering (car wash/repair/tire service)
+  - ✅ Business card with details
+  - ✅ Real-time status display
+
+**Frontend - Ionic (New, in development):**
+- ✅ **Admin Ionic App** (admin-ionic-app/) - http://localhost:5173
+  - ✅ Feature-Based Architecture implemented
+  - ✅ TypeScript + Pinia + Axios
+  - ✅ Auth, Dashboard, Status, Services, Bookings, Profile, Business Hours features
+  - ✅ Tilda Sans fonts integrated
+- 🔄 **Client Ionic App** (client-ionic-app/) - http://localhost:5173
+  - ✅ Basic structure with businesses feature
+  - ✅ Capacitor configured (PWA + native)
+  - 🔄 UI porting in progress
 
 **⚠️ Known Issue - Business Profile Not Loading in Header (Quasar Admin App):**
 - **Issue**: MainLayout header may not display business name and address after login
@@ -106,16 +123,14 @@ Project successfully rebranded from "ХичХайк (HitchHike)" to "Lets"
 - ✅ Backend server restarted and working with new database
 - ✅ All commits pushed to main branch
 
-**⚠️ PENDING ACTION:**
-- **Local folder rename**: After this session, rename C:\Projects\hitch_hike → C:\Projects\lets-app
-- **Update git remote**: After rename, run `git remote set-url origin https://github.com/NazarovEvgn/lets-app.git` (or it will auto-update)
+**Repository:** https://github.com/NazarovEvgn/lets-app
 
 **Test credentials** (still valid after rebrand):
 - familia.mendeleeva@example.com / Familia123
 - familia.charkova@example.com / Familia123
 - hollywood.salon@example.com / Hollywood123
 
-**🔄 Phase 5 (Started):** Migration to Ionic Framework + Tailwind CSS
+**🔄 Phase 5 (In Progress):** Migration to Ionic Framework + Tailwind CSS
 
 **Decision rationale:**
 - Both admin and client apps will be used primarily on smartphones
@@ -127,9 +142,18 @@ Project successfully rebranded from "ХичХайк (HitchHike)" to "Lets"
 - ✅ Ionic projects created (admin-ionic-app/ and client-ionic-app/)
 - ✅ Tailwind CSS v4 installed and configured
 - ✅ Capacitor configured in client-ionic-app (PWA + native)
-- 🔄 Need to implement Feature-Based Architecture
-- 🔄 Need to port Pinia stores and Axios configuration
-- 🔄 Need to rebuild UI from Quasar apps
+- ✅ Feature-Based Architecture implemented in admin-ionic-app
+  - ✅ auth feature (LoginPage, authStore)
+  - ✅ dashboard feature (DashboardPage)
+  - ✅ business-status feature (StatusUpdatePage, statusStore, statusService)
+  - ✅ services feature (ServicesListPage, ServiceFormModal, servicesStore, servicesApiService)
+  - ✅ bookings feature (BookingsListPage, BookingDetailsModal, bookingsStore, bookingsApiService)
+  - ✅ profile feature (ProfilePage, profileStore, profileApiService)
+  - ✅ business-hours feature (BusinessHoursPage, businessHoursStore, businessHoursApiService)
+- ✅ Feature-Based Architecture started in client-ionic-app
+  - ✅ businesses feature (MapPage, FavoritesPage, businessesStore, businessesApiService)
+- ✅ Core infrastructure (api client, config, router)
+- 🔄 UI porting from Quasar apps in progress
 
 **Technology stack:**
 - **Ionic Framework 8.x** - Native mobile components
@@ -148,29 +172,60 @@ Project successfully rebranded from "ХичХайк (HitchHike)" to "Lets"
 - Core infrastructure (API, router, config) in `core/` directory
 - No Atomic Design - keeping it simple and pragmatic
 
-**Target project structure:**
+**Implemented Feature Structure (admin-ionic-app):**
 ```
-admin-ionic-app/
-├── src/
-│   ├── features/           # Business features (isolated modules)
-│   │   ├── auth/
-│   │   ├── bookings/
-│   │   ├── services/
-│   │   ├── employees/
-│   │   ├── business-status/
-│   │   ├── profile/
-│   │   └── dashboard/
-│   ├── shared/             # Reusable across features
-│   │   ├── components/
-│   │   ├── composables/
-│   │   ├── utils/
-│   │   ├── types/
-│   │   └── layouts/
-│   └── core/               # Infrastructure
-│       ├── api/
-│       ├── router/
-│       └── config/
+admin-ionic-app/src/
+├── features/               # Feature-Based Architecture (IMPLEMENTED)
+│   ├── auth/
+│   │   ├── pages/         # LoginPage.vue
+│   │   ├── stores/        # authStore.ts (Pinia)
+│   │   └── types/         # TypeScript interfaces
+│   ├── dashboard/
+│   │   └── pages/         # DashboardPage.vue
+│   ├── business-status/
+│   │   ├── pages/         # StatusUpdatePage.vue
+│   │   ├── stores/        # statusStore.ts
+│   │   ├── services/      # statusService.ts (API calls)
+│   │   └── types/         # TypeScript interfaces
+│   ├── services/
+│   │   ├── pages/         # ServicesListPage.vue
+│   │   ├── components/    # ServiceFormModal.vue
+│   │   ├── stores/        # servicesStore.ts
+│   │   ├── services/      # servicesApiService.ts
+│   │   └── types/         # TypeScript interfaces
+│   ├── bookings/
+│   │   ├── pages/         # BookingsListPage.vue
+│   │   ├── components/    # BookingDetailsModal.vue
+│   │   ├── stores/        # bookingsStore.ts
+│   │   ├── services/      # bookingsApiService.ts
+│   │   └── types/         # TypeScript interfaces
+│   ├── profile/
+│   │   ├── pages/         # ProfilePage.vue
+│   │   ├── stores/        # profileStore.ts
+│   │   ├── services/      # profileApiService.ts
+│   │   └── types/         # TypeScript interfaces
+│   └── business-hours/
+│       ├── pages/         # BusinessHoursPage.vue
+│       ├── stores/        # businessHoursStore.ts
+│       ├── services/      # businessHoursApiService.ts
+│       └── types/         # TypeScript interfaces
+├── core/                   # Infrastructure
+│   ├── api/               # client.ts (Axios with JWT)
+│   ├── config/            # index.ts (API base URL)
+│   └── router/            # index.ts (Vue Router)
+└── theme/                  # Ionic CSS variables, Tilda Sans fonts
+
+client-ionic-app/src/
+├── features/               # Feature-Based Architecture (IN PROGRESS)
+│   └── businesses/
+│       ├── pages/         # MapPage.vue, FavoritesPage.vue
+│       ├── stores/        # businessesStore.ts
+│       ├── services/      # businessesApiService.ts
+│       └── types/         # TypeScript interfaces
+└── core/                   # Infrastructure (same as admin-ionic-app)
 ```
+
+**Note:** The shared/ directory will be added when common components emerge during development.
 
 **Phase 6 (Next):** Additional Features & Production Deployment
 - Online booking form (no registration required for clients)
@@ -460,15 +515,25 @@ lets-app/
 │
 ├── admin-ionic-app/           # 🔄 Ionic Admin App (TypeScript + Vue 3 + Tailwind)
 │   ├── src/
-│   │   ├── views/             # Current: HomePage (placeholder)
+│   │   ├── features/          # Feature-Based Architecture (IMPLEMENTED)
+│   │   │   ├── auth/         # LoginPage, authStore
+│   │   │   ├── dashboard/    # DashboardPage
+│   │   │   ├── business-status/  # StatusUpdatePage, statusStore, statusService
+│   │   │   ├── services/     # ServicesListPage, ServiceFormModal, servicesStore, servicesApiService
+│   │   │   ├── bookings/     # BookingsListPage, BookingDetailsModal, bookingsStore, bookingsApiService
+│   │   │   ├── profile/      # ProfilePage, profileStore, profileApiService
+│   │   │   └── business-hours/   # BusinessHoursPage, businessHoursStore, businessHoursApiService
+│   │   ├── core/              # API client, config, router
 │   │   ├── router/            # Vue Router
-│   │   └── theme/             # Ionic CSS variables
+│   │   └── theme/             # Ionic CSS variables, Tilda Sans fonts
 │   ├── vite.config.ts         # Vite configuration
 │   └── ionic.config.json      # Ionic CLI configuration
 │
 ├── client-ionic-app/          # 🔄 Ionic Client App (TypeScript + Vue 3 + Tailwind + Capacitor)
 │   ├── src/
-│   │   ├── views/             # Current: HomePage (placeholder)
+│   │   ├── features/          # Feature-Based Architecture (IN PROGRESS)
+│   │   │   └── businesses/   # MapPage, FavoritesPage, businessesStore, businessesApiService
+│   │   ├── core/              # API client, config, router
 │   │   ├── router/            # Vue Router
 │   │   └── theme/             # Ionic CSS variables + Tailwind
 │   ├── capacitor.config.ts    # Capacitor configuration (PWA + native)
@@ -592,8 +657,16 @@ ENVIRONMENT=development
 
 **Ionic/Tailwind Configuration:**
 - Define CSS variables in `src/theme/variables.css` (Ionic)
-- Extend Tailwind config with brand colors
+- Brand colors applied via CSS custom properties:
+  ```css
+  --ion-color-primary: #27126A;        /* Purple */
+  --ion-color-primary-rgb: 39,18,106;
+  --ion-color-secondary: #98EA14;      /* Green */
+  --ion-color-secondary-rgb: 152,234,20;
+  ```
+- Tilda Sans fonts loaded via `theme/fonts.css` in admin-ionic-app
 - Use Ionic components for consistent mobile UX
+- Tailwind extended with brand colors in `tailwind.config.js`
 
 ## Language Notes
 
@@ -627,8 +700,16 @@ ENVIRONMENT=development
    cd admin-app
    npm run dev  # http://localhost:9001
 
-   # Option B: Ionic Admin App (new, in development)
+   # Option B: Ionic Admin App (new, recommended for development)
    cd admin-ionic-app
+   npm run dev  # http://localhost:5173
+
+   # Option C: Quasar Client PWA (legacy, fully functional)
+   cd client-app
+   npm run dev  # http://localhost:9002
+
+   # Option D: Ionic Client App (new, in development)
+   cd client-ionic-app
    npm run dev  # http://localhost:5173
    ```
 
@@ -654,6 +735,8 @@ ENVIRONMENT=development
 - Always ensure Pinia is created before accessing stores
 - In Quasar apps, use `boot` files for initialization
 - In Ionic apps, initialize in `main.ts` before mounting the app
+- **CRITICAL for Ionic apps:** Pinia stores MUST be initialized in main.ts with `app.use(createPinia())` BEFORE the app is mounted
+- Feature stores should use `defineStore` and be imported lazily to avoid circular dependencies
 
 **2GIS Map Integration (Client App):**
 - Requires API key in quasar.config.js or environment variables
@@ -669,3 +752,18 @@ ENVIRONMENT=development
 - Use `127.0.0.1` instead of `localhost` for database connections
 - Use `.venv\Scripts\activate` (not `source .venv/bin/activate`)
 - argon2-cffi works better than bcrypt for password hashing on Windows
+
+**TypeScript in Ionic Apps:**
+- All Ionic apps use TypeScript 5.9 with strict type checking
+- API responses should have proper TypeScript interfaces defined in feature `types/` directories
+- Pinia stores should be strongly typed with proper state/getters/actions interfaces
+- Use Vue 3 Composition API with `<script setup lang="ts">` syntax
+- Import Ionic components from `@ionic/vue` with proper TypeScript types
+
+**API Client in Ionic Apps:**
+- Axios client configured in `src/core/api/client.ts` with JWT token interceptors
+- Base URL configured in `src/core/config/index.ts` (default: http://localhost:8000/api/v1)
+- Feature services (e.g., `servicesApiService.ts`) use the shared API client
+- Token automatically attached to requests via interceptor
+- Automatic token refresh on 401 errors (to be implemented)
+- Error handling with proper TypeScript error types
