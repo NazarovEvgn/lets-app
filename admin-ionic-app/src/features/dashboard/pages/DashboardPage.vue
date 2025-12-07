@@ -35,7 +35,7 @@
           </ion-card-header>
           <ion-card-content>
             <ion-list>
-              <ion-item button detail>
+              <ion-item button detail @click="router.push('/status')">
                 <ion-icon slot="start" :icon="timeOutline" color="primary" />
                 <ion-label>
                   <h2>Обновить статус</h2>
