@@ -58,6 +58,14 @@
                   <p>Редактировать прайс</p>
                 </ion-label>
               </ion-item>
+
+              <ion-item button detail @click="router.push('/profile')">
+                <ion-icon slot="start" :icon="personOutline" color="primary" />
+                <ion-label>
+                  <h2>Профиль</h2>
+                  <p>Настройки бизнеса</p>
+                </ion-label>
+              </ion-item>
             </ion-list>
           </ion-card-content>
         </ion-card>
@@ -102,6 +110,7 @@ import {
   timeOutline,
   calendarOutline,
   pricetagOutline,
+  personOutline,
 } from 'ionicons/icons'
 import { useAuthStore } from '@/features/auth/stores/authStore'
 

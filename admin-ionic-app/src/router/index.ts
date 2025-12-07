@@ -37,6 +37,12 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/features/bookings/pages/BookingsListPage.vue'),
     meta: { requiresAuth: true },
   },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: () => import('@/features/profile/pages/ProfilePage.vue'),
+    meta: { requiresAuth: true },
+  },
   // Fallback для неизвестных роутов
   {
     path: '/:pathMatch(.*)*',
