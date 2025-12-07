@@ -139,6 +139,10 @@ async function handleLogin() {
 </script>
 
 <style scoped>
+ion-content {
+  --background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+}
+
 .login-container {
   display: flex;
   flex-direction: column;
@@ -156,17 +160,51 @@ async function handleLogin() {
 h1 {
   color: var(--ion-color-primary);
   font-weight: 700;
-  font-size: 2.5rem;
+  font-size: 3rem;
   margin: 0;
   letter-spacing: -0.02em;
+  font-family: 'Tilda Sans', -apple-system, system-ui, sans-serif;
 }
 
 .login-card {
   width: 100%;
   max-width: 420px;
   margin: 0;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+ion-card-content {
+  padding: 32px 24px;
+}
+
+ion-item {
+  --background: #ffffff;
+  --border-radius: 12px;
+  --padding-start: 16px;
+  --inner-padding-end: 16px;
+  --border-width: 1px;
+  --border-color: var(--ion-color-light-shade);
+  margin-bottom: 16px;
+}
+
+ion-item:focus-within {
+  --border-color: var(--ion-color-primary);
+  --border-width: 2px;
+}
+
+ion-label {
+  font-weight: 500;
+  --color: var(--ion-color-dark);
+}
+
+ion-input {
+  --color: var(--ion-color-dark);
+  --placeholder-color: var(--ion-color-medium);
+  font-size: 1rem;
 }
 
 .error-message {
@@ -174,7 +212,7 @@ h1 {
   margin-bottom: 1.5rem;
   padding: 12px 16px;
   border-radius: 8px;
-  background-color: rgba(235, 68, 90, 0.1);
+  background-color: var(--ion-color-danger-tint);
   border-left: 3px solid var(--ion-color-danger);
 }
 
@@ -187,19 +225,20 @@ h1 {
 .login-button {
   margin-top: 1.5rem;
   --background: var(--ion-color-primary);
-  --border-radius: 8px;
-  height: 48px;
+  --border-radius: 12px;
+  height: 52px;
   font-weight: 600;
   font-size: 1rem;
+  text-transform: none;
+  letter-spacing: 0.02em;
 }
 
-ion-item {
-  --border-radius: 8px;
-  --padding-start: 16px;
-  --inner-padding-end: 16px;
+.login-button:hover {
+  opacity: 0.9;
 }
 
-ion-label {
-  font-weight: 500;
+/* Стили для кнопки показа/скрытия пароля */
+ion-button[fill="clear"] {
+  --color: var(--ion-color-primary);
 }
 </style>

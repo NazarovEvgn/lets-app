@@ -11,25 +11,21 @@
 @tailwind utilities;
 
 :root {
-  /* Брендовые цвета Lets */
-  --brand-primary: #27126A;   /* Фиолетовый */
-  --brand-accent: #98EA14;    /* Зеленый */
-
-  /* Ionic Primary (переопределяем на брендовый фиолетовый) */
-  --ion-color-primary: #27126A;
-  --ion-color-primary-rgb: 39, 18, 106;
+  /* Ionic Primary (черный) */
+  --ion-color-primary: #1a1a1a;
+  --ion-color-primary-rgb: 26, 26, 26;
   --ion-color-primary-contrast: #ffffff;
   --ion-color-primary-contrast-rgb: 255, 255, 255;
-  --ion-color-primary-shade: #22105d;
-  --ion-color-primary-tint: #3d2a79;
+  --ion-color-primary-shade: #171717;
+  --ion-color-primary-tint: #2e2e2e;
 
-  /* Ionic Success (используем брендовый зеленый) */
-  --ion-color-success: #98EA14;
-  --ion-color-success-rgb: 152, 234, 20;
-  --ion-color-success-contrast: #000000;
-  --ion-color-success-contrast-rgb: 0, 0, 0;
-  --ion-color-success-shade: #85ce12;
-  --ion-color-success-tint: #a2ec2c;
+  /* Ionic Success (дефолтный зеленый) */
+  --ion-color-success: #2dd36f;
+  --ion-color-success-rgb: 45, 211, 111;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #28ba62;
+  --ion-color-success-tint: #42d77d;
 
   /* Ionic Secondary */
   --ion-color-secondary: #3dc2ff;
