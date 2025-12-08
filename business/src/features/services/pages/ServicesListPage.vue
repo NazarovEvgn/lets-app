@@ -34,12 +34,21 @@
         <ion-item-sliding v-for="service in servicesStore.services" :key="service.id">
           <ion-item button @click="openEditModal(service)">
             <div class="service-card">
+              <!-- Service Photo -->
+              <div v-if="service.photo_url" class="service-photo">
+                <img :src="service.photo_url" :alt="service.name" />
+              </div>
+              <div v-else class="service-photo-placeholder">
+                <ion-icon :icon="imageOutline" size="large"></ion-icon>
+                <span>Фото услуги</span>
+              </div>
+
               <!-- Service Header -->
               <div class="service-header">
                 <div class="service-info">
                   <h3>{{ service.name }}</h3>
                 </div>
-                <div class="service-toggle">
+                <div class="service-toggle" @click.stop>
                   <ion-toggle
                     :checked="service.is_active"
                     @ion-change="toggleActive(service.id)"
@@ -131,6 +140,7 @@ import {
   createOutline,
   trashOutline,
   homeOutline,
+  imageOutline,
 } from 'ionicons/icons'
 import { useServicesStore } from '../stores/servicesStore'
 import ServiceFormModal from '../components/ServiceFormModal.vue'
@@ -361,6 +371,43 @@ async function handleDeleteFromModal() {
 .service-card {
   width: 100%;
   padding: 12px 0;
+}
+
+/* Service Photo */
+.service-photo {
+  width: 100%;
+  height: 200px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.service-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.service-photo-placeholder {
+  width: 100%;
+  height: 200px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  background: var(--ion-color-light);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--ion-color-medium);
+}
+
+.service-photo-placeholder ion-icon {
+  font-size: 48px;
+}
+
+.service-photo-placeholder span {
+  font-size: 0.9rem;
 }
 
 .service-header {

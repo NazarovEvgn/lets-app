@@ -6,6 +6,7 @@ export interface Service {
   price_from: number
   price_to: number
   duration_minutes: number
+  photo_url: string | null
   is_active: boolean
   created_at: string
   updated_at: string

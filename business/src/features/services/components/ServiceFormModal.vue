@@ -30,33 +30,13 @@
           <ion-textarea
             v-model="formData.description"
             placeholder="Краткое описание услуги"
-            :rows="3"
+            :rows="6"
+            :auto-grow="true"
           ></ion-textarea>
         </ion-item>
 
-        <!-- Price Type Checkbox -->
-        <ion-item lines="none" class="form-item checkbox-item">
-          <ion-checkbox v-model="isFixedPrice" @ionChange="handlePriceTypeChange">
-            Указать фиксированную цену
-          </ion-checkbox>
-        </ion-item>
-
-        <!-- Price Fields -->
-        <div v-if="isFixedPrice" class="price-container">
-          <ion-item lines="none" class="form-item">
-            <ion-label position="stacked">Цена (₽) *</ion-label>
-            <ion-input
-              v-model.number="formData.price_from"
-              type="number"
-              min="0"
-              step="10"
-              placeholder="0"
-              required
-            ></ion-input>
-          </ion-item>
-        </div>
-
-        <div v-else class="row">
+        <!-- Price Fields - Range (default) -->
+        <div v-if="!isFixedPrice" class="row">
           <ion-item lines="none" class="form-item col">
             <ion-label position="stacked">Цена от (₽) *</ion-label>
             <ion-input
@@ -82,6 +62,28 @@
           </ion-item>
         </div>
 
+        <!-- Price Field - Fixed -->
+        <div v-else class="price-container">
+          <ion-item lines="none" class="form-item">
+            <ion-label position="stacked">Цена (₽) *</ion-label>
+            <ion-input
+              v-model.number="formData.price_from"
+              type="number"
+              min="0"
+              step="10"
+              placeholder="0"
+              required
+            ></ion-input>
+          </ion-item>
+        </div>
+
+        <!-- Price Type Checkbox -->
+        <ion-item lines="none" class="form-item checkbox-item">
+          <ion-checkbox v-model="isFixedPrice" @ionChange="handlePriceTypeChange">
+            Указать фиксированную цену
+          </ion-checkbox>
+        </ion-item>
+
         <!-- Duration -->
         <ion-item lines="none" class="form-item">
           <ion-label position="stacked">Длительность (мин) *</ion-label>
@@ -96,9 +98,9 @@
         </ion-item>
 
         <!-- Active Toggle -->
-        <ion-item lines="none" class="form-item">
+        <ion-item lines="none" class="form-item toggle-item">
           <ion-label>Услуга активна</ion-label>
-          <ion-toggle v-model="formData.is_active" color="success"></ion-toggle>
+          <ion-toggle v-model="formData.is_active" color="success" slot="end"></ion-toggle>
         </ion-item>
 
         <!-- Action Buttons -->
@@ -200,8 +202,8 @@ watch(
         duration_minutes: newService.duration_minutes,
         is_active: newService.is_active,
       }
-      // Determine if it's a fixed price
-      isFixedPrice.value = newService.price_from === newService.price_to
+      // Always start with range fields (checkbox unchecked)
+      isFixedPrice.value = false
     } else {
       // Reset form for create mode
       formData.value = {
@@ -273,6 +275,11 @@ ion-label[position='stacked'] {
 
 .checkbox-item ion-checkbox {
   margin-right: 12px;
+}
+
+/* Toggle Item */
+.toggle-item ion-label {
+  margin-right: auto;
 }
 
 /* Price Container */
