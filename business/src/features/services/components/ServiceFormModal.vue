@@ -34,12 +34,33 @@
           ></ion-textarea>
         </ion-item>
 
-        <!-- Price & Duration Row -->
-        <div class="row">
-          <ion-item lines="none" class="form-item col">
+        <!-- Price Type Checkbox -->
+        <ion-item lines="none" class="form-item checkbox-item">
+          <ion-checkbox v-model="isFixedPrice" @ionChange="handlePriceTypeChange">
+            Указать фиксированную цену
+          </ion-checkbox>
+        </ion-item>
+
+        <!-- Price Fields -->
+        <div v-if="isFixedPrice" class="price-container">
+          <ion-item lines="none" class="form-item">
             <ion-label position="stacked">Цена (₽) *</ion-label>
             <ion-input
-              v-model.number="formData.price"
+              v-model.number="formData.price_from"
+              type="number"
+              min="0"
+              step="10"
+              placeholder="0"
+              required
+            ></ion-input>
+          </ion-item>
+        </div>
+
+        <div v-else class="row">
+          <ion-item lines="none" class="form-item col">
+            <ion-label position="stacked">Цена от (₽) *</ion-label>
+            <ion-input
+              v-model.number="formData.price_from"
               type="number"
               min="0"
               step="10"
@@ -49,17 +70,30 @@
           </ion-item>
 
           <ion-item lines="none" class="form-item col">
-            <ion-label position="stacked">Длительность (мин) *</ion-label>
+            <ion-label position="stacked">Цена до (₽) *</ion-label>
             <ion-input
-              v-model.number="formData.duration_minutes"
+              v-model.number="formData.price_to"
               type="number"
-              min="5"
-              step="5"
-              placeholder="30"
+              min="0"
+              step="10"
+              placeholder="0"
               required
             ></ion-input>
           </ion-item>
         </div>
+
+        <!-- Duration -->
+        <ion-item lines="none" class="form-item">
+          <ion-label position="stacked">Длительность (мин) *</ion-label>
+          <ion-input
+            v-model.number="formData.duration_minutes"
+            type="number"
+            min="5"
+            step="5"
+            placeholder="30"
+            required
+          ></ion-input>
+        </ion-item>
 
         <!-- Active Toggle -->
         <ion-item lines="none" class="form-item">
@@ -105,6 +139,7 @@ import {
   IonTextarea,
   IonToggle,
   IonIcon,
+  IonCheckbox,
 } from '@ionic/vue'
 import { closeOutline, trashOutline } from 'ionicons/icons'
 import type { Service, ServiceFormData } from '../types'
@@ -127,20 +162,29 @@ const emit = defineEmits<Emits>()
 const formData = ref<ServiceFormData>({
   name: '',
   description: '',
-  price: 0,
+  price_from: 0,
+  price_to: 0,
   duration_minutes: 30,
   is_active: true,
 })
+
+// Price type state
+const isFixedPrice = ref(false)
 
 // Computed
 const isEditMode = computed(() => props.service !== null)
 
 const isFormValid = computed(() => {
-  return (
+  const baseValid =
     formData.value.name.trim() !== '' &&
-    formData.value.price >= 0 &&
+    formData.value.price_from >= 0 &&
     formData.value.duration_minutes > 0
-  )
+
+  if (isFixedPrice.value) {
+    return baseValid
+  }
+
+  return baseValid && formData.value.price_to >= 0 && formData.value.price_to >= formData.value.price_from
 })
 
 // Watch service prop to populate form
@@ -151,19 +195,24 @@ watch(
       formData.value = {
         name: newService.name,
         description: newService.description || '',
-        price: newService.price,
+        price_from: newService.price_from,
+        price_to: newService.price_to,
         duration_minutes: newService.duration_minutes,
         is_active: newService.is_active,
       }
+      // Determine if it's a fixed price
+      isFixedPrice.value = newService.price_from === newService.price_to
     } else {
       // Reset form for create mode
       formData.value = {
         name: '',
         description: '',
-        price: 0,
+        price_from: 0,
+        price_to: 0,
         duration_minutes: 30,
         is_active: true,
       }
+      isFixedPrice.value = false
     }
   },
   { immediate: true }
@@ -174,12 +223,24 @@ function handleClose() {
   emit('close')
 }
 
+function handlePriceTypeChange() {
+  if (isFixedPrice.value) {
+    // When switching to fixed price, set price_to to price_from
+    formData.value.price_to = formData.value.price_from
+  }
+}
+
 function handleSubmit() {
   if (!isFormValid.value) return
 
-  emit('save', {
-    ...formData.value,
-  })
+  const submitData = { ...formData.value }
+
+  // If fixed price, ensure price_to equals price_from
+  if (isFixedPrice.value) {
+    submitData.price_to = submitData.price_from
+  }
+
+  emit('save', submitData)
 }
 
 function handleDelete() {
@@ -199,6 +260,24 @@ function handleDelete() {
 ion-label[position='stacked'] {
   font-weight: 500;
   margin-bottom: 8px;
+}
+
+/* Checkbox Item */
+.checkbox-item {
+  --background: transparent;
+  --padding-start: 0;
+  --padding-end: 0;
+  --inner-padding-end: 0;
+  margin-bottom: 16px;
+}
+
+.checkbox-item ion-checkbox {
+  margin-right: 12px;
+}
+
+/* Price Container */
+.price-container {
+  margin-bottom: 0;
 }
 
 /* Two Column Row */

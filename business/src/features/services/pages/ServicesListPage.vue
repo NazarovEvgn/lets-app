@@ -53,7 +53,7 @@
               <div class="service-details">
                 <div class="detail-item">
                   <ion-icon :icon="cashOutline" color="primary"></ion-icon>
-                  <span class="detail-value">{{ formatPrice(service.price) }}</span>
+                  <span class="detail-value">{{ formatPriceRange(service.price_from, service.price_to) }}</span>
                 </div>
                 <div class="detail-item">
                   <ion-icon :icon="timeOutline" color="primary"></ion-icon>
@@ -143,13 +143,23 @@ onMounted(async () => {
   await servicesStore.fetchServices()
 })
 
-// Format price to RUB
-function formatPrice(price: number): string {
-  return new Intl.NumberFormat('ru-RU', {
+// Format price range to RUB
+function formatPriceRange(priceFrom: number, priceTo: number): string {
+  // Handle NaN or undefined values
+  if (!priceFrom && priceFrom !== 0) priceFrom = 0
+  if (!priceTo && priceTo !== 0) priceTo = 0
+
+  const formatter = new Intl.NumberFormat('ru-RU', {
     style: 'currency',
     currency: 'RUB',
     minimumFractionDigits: 0,
-  }).format(price)
+  })
+
+  if (priceFrom === priceTo) {
+    return formatter.format(priceFrom)
+  }
+
+  return `${formatter.format(priceFrom)} - ${formatter.format(priceTo)}`
 }
 
 // Open create modal

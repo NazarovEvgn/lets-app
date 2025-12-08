@@ -7,7 +7,8 @@ class ServiceBase(BaseModel):
 
     name: str
     description: str | None = None
-    price: float
+    price_from: float
+    price_to: float
     duration_minutes: int
 
 
@@ -22,7 +23,8 @@ class ServiceUpdate(BaseModel):
 
     name: str | None = None
     description: str | None = None
-    price: float | None = None
+    price_from: float | None = None
+    price_to: float | None = None
     duration_minutes: int | None = None
     is_active: bool | None = None
 

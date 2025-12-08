@@ -3,7 +3,8 @@ export interface Service {
   business_id: number
   name: string
   description: string | null
-  price: number
+  price_from: number
+  price_to: number
   duration_minutes: number
   is_active: boolean
   created_at: string
@@ -13,7 +14,8 @@ export interface Service {
 export interface ServiceCreateInput {
   name: string
   description?: string
-  price: number
+  price_from: number
+  price_to: number
   duration_minutes: number
   is_active: boolean
 }
@@ -21,7 +23,8 @@ export interface ServiceCreateInput {
 export interface ServiceUpdateInput {
   name?: string
   description?: string
-  price?: number
+  price_from?: number
+  price_to?: number
   duration_minutes?: number
   is_active?: boolean
 }
@@ -29,7 +32,8 @@ export interface ServiceUpdateInput {
 export interface ServiceFormData {
   name: string
   description: string
-  price: number
+  price_from: number
+  price_to: number
   duration_minutes: number
   is_active: boolean
 }
