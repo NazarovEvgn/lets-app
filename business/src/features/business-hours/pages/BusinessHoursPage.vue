@@ -1,19 +1,9 @@
 <template>
   <ion-page>
-    <ion-header>
-      <ion-toolbar color="primary">
-        <ion-title>Часы работы</ion-title>
-      </ion-toolbar>
-    </ion-header>
+    <AppHeader />
 
     <ion-content :fullscreen="true">
-      <!-- Back Button -->
-      <div class="back-button-container">
-        <ion-button fill="clear" size="small" @click="$router.back()">
-          <ion-icon slot="start" :icon="arrowBackOutline"></ion-icon>
-          Назад
-        </ion-button>
-      </div>
+      <PageNavigation page-title="Часы работы" />
 
       <!-- Loading -->
       <div v-if="businessHoursStore.loading && schedules.length === 0" class="loading-container">
@@ -138,9 +128,6 @@
 import { ref, computed, onMounted } from 'vue'
 import {
   IonPage,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
   IonContent,
   IonList,
   IonItem,
@@ -153,9 +140,11 @@ import {
   IonSpinner,
   toastController,
 } from '@ionic/vue'
-import { copyOutline, arrowBackOutline, homeOutline } from 'ionicons/icons'
+import { copyOutline, homeOutline } from 'ionicons/icons'
 import { useBusinessHoursStore } from '../stores/businessHoursStore'
 import type { DaySchedule } from '../types'
+import AppHeader from '@/shared/components/AppHeader.vue'
+import PageNavigation from '@/shared/components/PageNavigation.vue'
 
 const businessHoursStore = useBusinessHoursStore()
 
@@ -266,10 +255,6 @@ async function saveSchedule() {
 </script>
 
 <style scoped>
-.back-button-container {
-  padding: 8px 16px;
-}
-
 .back-to-home-container {
   padding: 24px 0;
 }

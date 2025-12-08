@@ -1,24 +1,15 @@
 <template>
   <ion-page>
-    <ion-header>
-      <ion-toolbar color="primary">
-        <ion-title>Онлайн-записи</ion-title>
-        <ion-buttons slot="end">
-          <ion-button @click="fetchBookings()">
-            <ion-icon slot="icon-only" :icon="refreshOutline" />
-          </ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
+    <AppHeader>
+      <template #actions>
+        <ion-button @click="fetchBookings()">
+          <ion-icon slot="icon-only" :icon="refreshOutline" />
+        </ion-button>
+      </template>
+    </AppHeader>
 
     <ion-content :fullscreen="true">
-      <!-- Back Button -->
-      <div class="back-button-container">
-        <ion-button fill="clear" size="small" @click="$router.back()">
-          <ion-icon slot="start" :icon="arrowBackOutline"></ion-icon>
-          Назад
-        </ion-button>
-      </div>
+      <PageNavigation page-title="Онлайн-записи" />
 
       <!-- Filter -->
       <div class="filter-container ion-padding">
@@ -136,11 +127,6 @@
 import { ref, onMounted } from 'vue'
 import {
   IonPage,
-  IonHeader,
-  IonToolbar,
-  IonButtons,
-  IonButton,
-  IonTitle,
   IonContent,
   IonSegment,
   IonSegmentButton,
@@ -153,6 +139,7 @@ import {
   IonIcon,
   IonBadge,
   IonSpinner,
+  IonButton,
   toastController,
 } from '@ionic/vue'
 import {
@@ -164,12 +151,13 @@ import {
   checkmarkOutline,
   checkmarkDoneOutline,
   closeOutline,
-  arrowBackOutline,
   homeOutline,
 } from 'ionicons/icons'
 import { useBookingsStore } from '../stores/bookingsStore'
 import BookingDetailsModal from '../components/BookingDetailsModal.vue'
 import type { Booking, BookingStatus } from '../types'
+import AppHeader from '@/shared/components/AppHeader.vue'
+import PageNavigation from '@/shared/components/PageNavigation.vue'
 
 const bookingsStore = useBookingsStore()
 const selectedStatus = ref('all')
@@ -257,10 +245,6 @@ async function handleStatusUpdate(bookingId: number, newStatus: BookingStatus) {
 </script>
 
 <style scoped>
-.back-button-container {
-  padding: 8px 16px;
-}
-
 .back-to-home-container {
   padding: 24px 16px;
 }

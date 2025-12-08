@@ -1,24 +1,15 @@
 <template>
   <ion-page>
-    <ion-header>
-      <ion-toolbar color="primary">
-        <ion-title>Услуги</ion-title>
-        <ion-buttons slot="end">
-          <ion-button @click="openCreateModal">
-            <ion-icon slot="icon-only" :icon="addOutline" />
-          </ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
+    <AppHeader>
+      <template #actions>
+        <ion-button @click="openCreateModal">
+          <ion-icon slot="icon-only" :icon="addOutline" />
+        </ion-button>
+      </template>
+    </AppHeader>
 
     <ion-content :fullscreen="true">
-      <!-- Back Button -->
-      <div class="back-button-container">
-        <ion-button fill="clear" size="small" @click="$router.back()">
-          <ion-icon slot="start" :icon="arrowBackOutline"></ion-icon>
-          Назад
-        </ion-button>
-      </div>
+      <PageNavigation page-title="Услуги" />
 
       <!-- Loading State -->
       <div v-if="servicesStore.loading && servicesStore.services.length === 0" class="loading-container">
@@ -105,11 +96,6 @@
 import { ref, onMounted } from 'vue'
 import {
   IonPage,
-  IonHeader,
-  IonToolbar,
-  IonButtons,
-  IonButton,
-  IonTitle,
   IonContent,
   IonList,
   IonItem,
@@ -120,6 +106,7 @@ import {
   IonToggle,
   IonBadge,
   IonSpinner,
+  IonButton,
   alertController,
   toastController,
 } from '@ionic/vue'
@@ -130,12 +117,13 @@ import {
   timeOutline,
   createOutline,
   trashOutline,
-  arrowBackOutline,
   homeOutline,
 } from 'ionicons/icons'
 import { useServicesStore } from '../stores/servicesStore'
 import ServiceFormModal from '../components/ServiceFormModal.vue'
 import type { Service, ServiceFormData } from '../types'
+import AppHeader from '@/shared/components/AppHeader.vue'
+import PageNavigation from '@/shared/components/PageNavigation.vue'
 
 const servicesStore = useServicesStore()
 const isModalOpen = ref(false)
@@ -266,10 +254,6 @@ async function handleDelete(id: number) {
 </script>
 
 <style scoped>
-.back-button-container {
-  padding: 8px 16px;
-}
-
 .back-to-home-container {
   padding: 24px 16px;
 }

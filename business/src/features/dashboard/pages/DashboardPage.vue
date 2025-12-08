@@ -1,30 +1,16 @@
 <template>
   <ion-page>
-    <ion-header>
-      <ion-toolbar color="primary">
-        <ion-title>{{ businessName || 'Dashboard' }}</ion-title>
-        <ion-buttons slot="end">
-          <ion-button @click="handleLogout">
-            <ion-icon slot="icon-only" :icon="logOutOutline" />
-          </ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
+    <AppHeader>
+      <template #actions>
+        <ion-button @click="handleLogout">
+          <ion-icon slot="icon-only" :icon="logOutOutline" />
+        </ion-button>
+      </template>
+    </AppHeader>
 
     <ion-content class="ion-padding">
+      <PageNavigation page-title="Главная" :show-back-button="false" />
       <div class="dashboard-container">
-        <!-- Информация о бизнесе -->
-        <ion-card v-if="business">
-          <ion-card-header>
-            <ion-card-title>{{ business.name }}</ion-card-title>
-            <ion-card-subtitle>{{ business.address }}</ion-card-subtitle>
-          </ion-card-header>
-          <ion-card-content>
-            <p><strong>Тип:</strong> {{ businessTypeLabel }}</p>
-            <p><strong>Телефон:</strong> {{ business.phone }}</p>
-          </ion-card-content>
-        </ion-card>
-
         <!-- Статус доступности -->
         <ion-card>
           <ion-card-content>
@@ -131,24 +117,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   IonPage,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
   IonContent,
   IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardSubtitle,
   IonCardContent,
   IonList,
   IonItem,
   IonLabel,
   IonIcon,
-  IonButtons,
   IonButton,
   toastController,
 } from '@ionic/vue'
@@ -162,26 +141,14 @@ import {
 import { Switch } from '@headlessui/vue'
 import { useAuthStore } from '@/features/auth/stores/authStore'
 import { useStatusStore } from '@/features/business-status/stores/statusStore'
+import AppHeader from '@/shared/components/AppHeader.vue'
+import PageNavigation from '@/shared/components/PageNavigation.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const statusStore = useStatusStore()
 
 const isAvailable = ref(false)
-
-// Computed
-const businessName = computed(() => authStore.businessName)
-const business = computed(() => authStore.business)
-
-const businessTypeLabel = computed(() => {
-  const typeMap: Record<string, string> = {
-    car_wash: 'Автомойка',
-    auto_repair: 'Автосервис',
-    tire_service: 'Шиномонтаж',
-    beauty_salon: 'Салон красоты',
-  }
-  return business.value ? typeMap[business.value.business_type] || business.value.business_type : ''
-})
 
 // Load current status on mount
 onMounted(async () => {

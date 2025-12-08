@@ -1,19 +1,9 @@
 <template>
   <ion-page>
-    <ion-header>
-      <ion-toolbar color="primary">
-        <ion-title>Профиль</ion-title>
-      </ion-toolbar>
-    </ion-header>
+    <AppHeader />
 
     <ion-content :fullscreen="true">
-      <!-- Back Button -->
-      <div class="back-button-container">
-        <ion-button fill="clear" size="small" @click="$router.back()">
-          <ion-icon slot="start" :icon="arrowBackOutline"></ion-icon>
-          Назад
-        </ion-button>
-      </div>
+      <PageNavigation page-title="Профиль" />
 
       <!-- Loading -->
       <div v-if="profileStore.loading && !profileStore.business" class="loading-container">
@@ -168,9 +158,6 @@
 import { ref, reactive, onMounted } from 'vue'
 import {
   IonPage,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
   IonContent,
   IonInput,
   IonTextarea,
@@ -181,9 +168,11 @@ import {
   IonSpinner,
   toastController,
 } from '@ionic/vue'
-import { alertCircleOutline, arrowBackOutline, homeOutline } from 'ionicons/icons'
+import { alertCircleOutline, homeOutline } from 'ionicons/icons'
 import { useProfileStore } from '../stores/profileStore'
 import type { BusinessUpdateInput } from '../types'
+import AppHeader from '@/shared/components/AppHeader.vue'
+import PageNavigation from '@/shared/components/PageNavigation.vue'
 
 const profileStore = useProfileStore()
 
@@ -343,10 +332,6 @@ async function handleSubmit() {
 .coordinate-value {
   font-weight: 600;
   color: var(--ion-color-dark);
-}
-
-.back-button-container {
-  padding: 8px 16px;
 }
 
 .back-to-home-container {
