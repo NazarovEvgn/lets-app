@@ -1,7 +1,9 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from loguru import logger
+from pathlib import Path
 
 from app.core.config import settings
 from app.core.redis import redis_client
@@ -42,13 +44,19 @@ app.add_middleware(
 )
 
 # Include routers
-from app.api.v1 import admin, businesses, bookings, favorites
+from app.api.v1 import admin, businesses, bookings, favorites, upload
 
 app.include_router(auth.router, prefix="/api/v1")
 app.include_router(admin.router, prefix="/api/v1")
 app.include_router(businesses.router, prefix="/api/v1")
 app.include_router(bookings.router, prefix="/api/v1")
 app.include_router(favorites.router, prefix="/api/v1")
+app.include_router(upload.router, prefix="/api/v1")
+
+# Mount static files for uploaded photos
+UPLOAD_DIR = Path("uploads")
+UPLOAD_DIR.mkdir(exist_ok=True)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 
 @app.get("/")

@@ -10,6 +10,7 @@ class ServiceBase(BaseModel):
     price_from: float
     price_to: float
     duration_minutes: int
+    photo_url: str | None = None
 
 
 class ServiceCreate(ServiceBase):
@@ -26,6 +27,7 @@ class ServiceUpdate(BaseModel):
     price_from: float | None = None
     price_to: float | None = None
     duration_minutes: int | None = None
+    photo_url: str | None = None
     is_active: bool | None = None
 
 

@@ -17,6 +17,7 @@ class Service(Base):
     price_from: Mapped[float] = mapped_column(Float)
     price_to: Mapped[float] = mapped_column(Float)
     duration_minutes: Mapped[int] = mapped_column(Integer)
+    photo_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(
