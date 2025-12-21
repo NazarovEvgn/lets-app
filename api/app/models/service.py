@@ -27,3 +27,6 @@ class Service(Base):
     # Relationships
     business: Mapped["Business"] = relationship("Business", back_populates="services")
     bookings: Mapped[list["Booking"]] = relationship("Booking", back_populates="service")
+    employees: Mapped[list["Employee"]] = relationship(
+        "Employee", secondary="employee_services", back_populates="services", lazy="selectin"
+    )

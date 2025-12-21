@@ -805,11 +805,27 @@ async def create_employee(
         business_id=current_admin.business_id,
         name=employee_data.name,
         phone=employee_data.phone,
-        position=employee_data.position,
+        photo_url=employee_data.photo_url,
         is_active=employee_data.is_active,
     )
 
     db.add(employee)
+    await db.flush()  # Flush to get employee.id before adding services
+
+    # Add services if provided
+    if employee_data.service_ids:
+        # Fetch services that belong to this business
+        services_result = await db.execute(
+            select(Service).where(
+                and_(
+                    Service.id.in_(employee_data.service_ids),
+                    Service.business_id == current_admin.business_id,
+                )
+            )
+        )
+        services = services_result.scalars().all()
+        employee.services = services
+
     await db.commit()
     await db.refresh(employee)
 
@@ -844,12 +860,58 @@ async def update_employee(
         employee.name = employee_data.name
     if employee_data.phone is not None:
         employee.phone = employee_data.phone
-    if employee_data.position is not None:
-        employee.position = employee_data.position
+    if employee_data.photo_url is not None:
+        employee.photo_url = employee_data.photo_url
     if employee_data.is_active is not None:
         employee.is_active = employee_data.is_active
 
+    # Update services if provided
+    if employee_data.service_ids is not None:
+        # Fetch services that belong to this business
+        services_result = await db.execute(
+            select(Service).where(
+                and_(
+                    Service.id.in_(employee_data.service_ids),
+                    Service.business_id == current_admin.business_id,
+                )
+            )
+        )
+        services = services_result.scalars().all()
+        employee.services = services
+
     employee.updated_at = datetime.utcnow()
+    await db.commit()
+    await db.refresh(employee)
+
+    return employee
+
+
+@router.patch("/employees/{employee_id}/toggle-active", response_model=EmployeeSchema)
+async def toggle_employee_active(
+    employee_id: int,
+    current_admin: BusinessAdmin = Depends(get_current_business_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """Toggle employee active status."""
+    result = await db.execute(
+        select(Employee).where(
+            and_(
+                Employee.id == employee_id,
+                Employee.business_id == current_admin.business_id,
+            )
+        )
+    )
+    employee = result.scalar_one_or_none()
+
+    if not employee:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Employee not found",
+        )
+
+    employee.is_active = not employee.is_active
+    employee.updated_at = datetime.utcnow()
+
     await db.commit()
     await db.refresh(employee)
 
