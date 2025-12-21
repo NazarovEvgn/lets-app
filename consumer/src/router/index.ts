@@ -7,6 +7,11 @@ const routes: Array<RouteRecordRaw> = [
     redirect: '/map'
   },
   {
+    path: '/login',
+    name: 'Login',
+    component: () => import('@/features/auth/pages/LoginPage.vue')
+  },
+  {
     path: '/map',
     name: 'Map',
     component: () => import('@/features/businesses/pages/MapPage.vue')

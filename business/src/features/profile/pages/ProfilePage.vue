@@ -37,10 +37,10 @@
 
           <!-- Business Type -->
           <div class="form-group">
-            <label class="form-label">Тип бизнеса</label>
+            <label class="form-label">Вид деятельности</label>
             <ion-select
               v-model="formData.business_type"
-              placeholder="Выберите тип"
+              placeholder="Выберите вид деятельности"
               interface="action-sheet"
               :class="{ 'ion-invalid': errors.business_type, 'ion-touched': true }"
             >
@@ -355,6 +355,22 @@ async function handleSubmit() {
   --padding-start: 8px;
   --padding-end: 8px;
   margin: 0;
+}
+
+.field-label-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.field-label-with-icon .form-label {
+  margin-bottom: 0;
+}
+
+.edit-icon {
+  font-size: 16px;
+  color: var(--ion-color-medium);
 }
 
 .form-label {

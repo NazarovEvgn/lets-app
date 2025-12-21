@@ -55,3 +55,16 @@ class BusinessAdminRegister(BaseModel):
     phone: str
     business_email: str | None = None
     description: str | None = None
+
+
+class PhoneOTPRequest(BaseModel):
+    """Request OTP code for passwordless login."""
+
+    phone: str
+
+
+class OTPVerify(BaseModel):
+    """Verify OTP code for passwordless login."""
+
+    phone: str
+    code: str

@@ -25,6 +25,7 @@ class BusinessUpdate(BaseModel):
     """Business update schema."""
 
     name: str | None = None
+    type: str | None = None
     address: str | None = None
     phones: list[str] | None = None
     email: str | None = None
