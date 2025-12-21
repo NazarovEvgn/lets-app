@@ -64,13 +64,19 @@ const router = createRouter({
 /**
  * Navigation Guard - проверка аутентификации
  */
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
   const requiresAuth = to.meta.requiresAuth !== false // По умолчанию требуется auth
 
   console.log('[Router] Navigate to:', to.path)
   console.log('[Router] Requires auth:', requiresAuth)
   console.log('[Router] Is authenticated:', authStore.isAuthenticated)
+
+  // Если пользователь авторизован, но профиль еще не загружен - загружаем
+  if (authStore.isAuthenticated && !authStore.business) {
+    console.log('[Router] Loading business profile...')
+    await authStore.fetchProfile()
+  }
 
   if (requiresAuth && !authStore.isAuthenticated) {
     // Требуется авторизация, но пользователь не авторизован
