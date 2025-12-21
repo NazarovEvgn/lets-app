@@ -163,8 +163,10 @@ onMounted(async () => {
 function getPhotoUrl(photoUrl: string | null): string {
   if (!photoUrl) return ''
   if (photoUrl.startsWith('http')) return photoUrl
-  const apiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
-  return `${apiUrl}${photoUrl}`
+  // Remove /api/v1 suffix to get base URL for static files
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api/v1'
+  const baseUrl = apiUrl.replace('/api/v1', '')
+  return `${baseUrl}${photoUrl}`
 }
 
 // Get service name by ID

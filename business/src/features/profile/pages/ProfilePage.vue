@@ -13,6 +13,15 @@
       <!-- Form -->
       <div v-else-if="profileStore.business" class="profile-form ion-padding">
         <form @submit.prevent="handleSubmit">
+          <!-- Logo Photo -->
+          <div class="form-group">
+            <label class="form-label">Логотип</label>
+            <PhotoUpload
+              v-model="formData.logo_url"
+              label="Добавить логотип"
+            />
+          </div>
+
           <!-- Business Name -->
           <div class="form-group">
             <label class="form-label">Название бизнеса</label>
@@ -81,31 +90,20 @@
             <div v-if="errors.description" class="error-text">{{ errors.description }}</div>
           </div>
 
-          <!-- Logo URL -->
-          <div class="form-group">
-            <label class="form-label">URL логотипа</label>
-            <ion-input
-              v-model="formData.logo_url"
-              type="url"
-              placeholder="https://example.com/logo.png"
-              :class="{ 'ion-invalid': errors.logo_url, 'ion-touched': true }"
-            ></ion-input>
-            <div v-if="errors.logo_url" class="error-text">{{ errors.logo_url }}</div>
-          </div>
-
-          <!-- Coordinates (Read-only) -->
-          <div class="form-group">
-            <label class="form-label">Координаты (только для чтения)</label>
-            <div class="coordinates-display">
-              <div class="coordinate-item">
-                <span class="coordinate-label">Широта:</span>
-                <span class="coordinate-value">{{ profileStore.business.latitude }}</span>
-              </div>
-              <div class="coordinate-item">
-                <span class="coordinate-label">Долгота:</span>
-                <span class="coordinate-value">{{ profileStore.business.longitude }}</span>
-              </div>
-            </div>
+          <!-- Business Hours Accordion -->
+          <div class="hours-accordion-container">
+            <ion-accordion-group>
+              <ion-accordion value="business-hours">
+                <ion-item slot="header" color="light">
+                  <ion-label>
+                    <h3>Часы работы</h3>
+                  </ion-label>
+                </ion-item>
+                <div class="ion-padding" slot="content">
+                  <BusinessHoursForm />
+                </div>
+              </ion-accordion>
+            </ion-accordion-group>
           </div>
 
           <!-- Email (Read-only) -->
@@ -132,23 +130,6 @@
             <span v-else>Сохранить изменения</span>
           </ion-button>
         </form>
-
-        <!-- Business Hours Accordion -->
-        <div class="hours-accordion-container">
-          <ion-accordion-group>
-            <ion-accordion value="business-hours">
-              <ion-item slot="header" color="light">
-                <ion-label>
-                  <h3>Часы работы</h3>
-                  <p>Настройте расписание работы</p>
-                </ion-label>
-              </ion-item>
-              <div class="ion-padding" slot="content">
-                <BusinessHoursForm />
-              </div>
-            </ion-accordion>
-          </ion-accordion-group>
-        </div>
       </div>
 
       <!-- Error State -->
@@ -195,6 +176,7 @@ import type { BusinessUpdateInput } from '../types'
 import AppHeader from '@/shared/components/AppHeader.vue'
 import PageNavigation from '@/shared/components/PageNavigation.vue'
 import BusinessHoursForm from '@/features/business-hours/components/BusinessHoursForm.vue'
+import PhotoUpload from '@/shared/components/PhotoUpload.vue'
 
 const profileStore = useProfileStore()
 
@@ -331,31 +313,6 @@ async function handleSubmit() {
   margin: 8px 0 0 0;
 }
 
-.coordinates-display {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px;
-  background: var(--ion-color-light);
-  border-radius: 8px;
-}
-
-.coordinate-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.coordinate-label {
-  font-weight: 500;
-  color: var(--ion-color-medium);
-}
-
-.coordinate-value {
-  font-weight: 600;
-  color: var(--ion-color-dark);
-}
-
 .back-to-home-container {
   padding: 24px 16px;
   max-width: 600px;
@@ -368,6 +325,32 @@ async function handleSubmit() {
 
 .hours-accordion-container {
   margin-top: 32px;
+  margin-bottom: 24px;
+}
+
+.hours-accordion-container ion-accordion-group {
+  border: 2px solid var(--ion-color-medium-tint);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.hours-accordion-container ion-accordion-group:hover {
+  border-color: var(--ion-color-primary);
+  box-shadow: 0 4px 12px rgba(39, 18, 106, 0.15);
+}
+
+.hours-accordion-container ion-item {
+  --border-radius: 0;
+  cursor: pointer;
+}
+
+.hours-accordion-container ion-label h3 {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--ion-color-dark);
 }
 
 ion-input,
