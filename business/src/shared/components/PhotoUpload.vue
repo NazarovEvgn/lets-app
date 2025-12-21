@@ -62,8 +62,10 @@ const fullPhotoUrl = computed(() => {
   if (!photoUrl.value) return ''
   // If it's already a full URL, return as is
   if (photoUrl.value.startsWith('http')) return photoUrl.value
-  // Otherwise prepend API base URL
-  return `${import.meta.env.VITE_API_BASE_URL.replace('/api/v1', '')}${photoUrl.value}`
+  // Otherwise prepend API base URL (remove /api/v1 suffix to get base URL)
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api/v1'
+  const baseUrl = apiUrl.replace('/api/v1', '')
+  return `${baseUrl}${photoUrl.value}`
 })
 
 function triggerFileInput() {

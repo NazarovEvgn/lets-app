@@ -139,6 +139,7 @@ uv run black .        # Форматирование
 - PostgreSQL работает на порту **5433** (не 5432) чтобы избежать конфликта с локальным PostgreSQL 17
 - Используй `127.0.0.1` вместо `localhost` в DATABASE_URL на Windows
 - Проверяй автогенерированные миграции для Enum (должны использовать lowercase значения)
+- КРИТИЧНО: Директория `api/uploads/` должна существовать! Создай её: `mkdir -p api/uploads`
 
 ### Frontend - Business App (business/)
 
@@ -168,6 +169,7 @@ npx cap open android   # Открыть в Android Studio
 - `business` работает на порту 5173, `consumer` на 5174 (избегаем конфликта)
 - Оба приложения используют Feature-Based Architecture
 - Pinia ДОЛЖНА быть инициализирована в `main.ts` ДО монтирования приложения
+- **КРИТИЧНО:** Business app использует `VITE_API_URL`, Consumer app использует `VITE_API_BASE_URL`
 
 ## Переменные окружения
 
@@ -198,7 +200,8 @@ ENVIRONMENT=development
 
 **business/.env**:
 ```bash
-VITE_API_BASE_URL=http://localhost:8000/api/v1
+# ВАЖНО: Business app использует VITE_API_URL (не VITE_API_BASE_URL!)
+VITE_API_URL=http://127.0.0.1:8000/api/v1
 ```
 
 **consumer/.env**:
@@ -226,6 +229,16 @@ VITE_DGIS_API_KEY=your-2gis-api-key-here
 - `/api/v1/businesses/*` - Просмотр сервисов, поиск рядом (публичный или client auth)
 - `/api/v1/bookings/*` - Управление записями
 - `/api/v1/favorites/*` - Управление избранным
+- `/api/v1/upload/*` - Загрузка и удаление фото (требует business_admin auth)
+
+**Загрузка фото:**
+- Endpoint: `POST /api/v1/upload/photo` (multipart/form-data)
+- Макс. размер файла: 5MB
+- Разрешённые форматы: .jpg, .jpeg, .png, .webp
+- Файлы сохраняются в `api/uploads/{business_id}/{uuid}.{ext}`
+- Статическая раздача: `GET /uploads/{business_id}/{filename}`
+- Возвращаемый URL: `/uploads/{business_id}/{filename}` (относительный путь)
+- Frontend формирует полный URL: `{API_BASE_URL без /api/v1}/uploads/...`
 
 ### Frontend (Ionic Apps)
 
@@ -362,14 +375,20 @@ docker-compose up -d
 docker ps  # Проверка: lets_postgres (healthy), lets_redis (healthy)
 ```
 
-**2. Запустить backend API:**
+**2. Создать директорию для загрузки фото (если её нет):**
+```bash
+cd api
+mkdir -p uploads
+```
+
+**3. Запустить backend API:**
 ```bash
 cd api
 uv run uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 # API docs: http://localhost:8000/docs
 ```
 
-**3. Запустить frontend (выбрать нужное):**
+**4. Запустить frontend (выбрать нужное):**
 ```bash
 # Business приложение (админка)
 cd business
@@ -386,6 +405,14 @@ npm run dev  # http://localhost:5174
 - hollywood.salon@example.com / Hollywood123
 
 ## Типичные проблемы и решения
+
+**Проблема с загрузкой фото:**
+- КРИТИЧЕСКИ ВАЖНО: Директория `api/uploads/` ДОЛЖНА существовать для работы загрузки фото
+- Создай её командой: `cd api && mkdir -p uploads`
+- Business app использует переменную окружения `VITE_API_URL` (НЕ `VITE_API_BASE_URL`!)
+- Consumer app использует `VITE_API_BASE_URL` - это правильно для consumer
+- При отображении фото URL формируется так: `apiUrl.replace('/api/v1', '') + photoUrl`
+- Пример: `http://127.0.0.1:8000` + `/uploads/1/photo.jpg` = `http://127.0.0.1:8000/uploads/1/photo.jpg`
 
 **PostgreSQL Port Conflict:**
 - Docker PostgreSQL работает на порту **5433** (не 5432)

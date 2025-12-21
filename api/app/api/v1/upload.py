@@ -8,7 +8,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.auth import get_current_business_admin
+from app.api.dependencies import get_current_business_admin
 from app.core.database import get_db
 from app.models.business import Business
 
