@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { bookingsApiService } from '../services/bookingsApiService'
 import type { Booking, BookingFilters, BookingStatus } from '../types'
 
@@ -7,6 +7,13 @@ export const useBookingsStore = defineStore('bookings', () => {
   const bookings = ref<Booking[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
+
+  // Computed: количество неотработанных записей (pending + confirmed)
+  const activeBookingsCount = computed(() => {
+    return bookings.value.filter(
+      (b) => b.status === 'pending' || b.status === 'confirmed'
+    ).length
+  })
 
   async function fetchBookings(filters?: BookingFilters): Promise<void> {
     loading.value = true
@@ -45,6 +52,7 @@ export const useBookingsStore = defineStore('bookings', () => {
     bookings,
     loading,
     error,
+    activeBookingsCount,
     fetchBookings,
     updateBookingStatus,
   }

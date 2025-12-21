@@ -40,6 +40,14 @@
                   <h2>Онлайн-записи</h2>
                   <p>Управление бронированиями</p>
                 </ion-label>
+                <ion-badge
+                  v-if="bookingsStore.activeBookingsCount > 0"
+                  slot="end"
+                  color="primary"
+                  class="bookings-badge"
+                >
+                  {{ bookingsStore.activeBookingsCount }}
+                </ion-badge>
               </ion-item>
 
               <ion-item button detail @click="router.push('/services')">
@@ -87,6 +95,7 @@ import {
   IonIcon,
   IonButton,
   IonToggle,
+  IonBadge,
   toastController,
 } from '@ionic/vue'
 import {
@@ -98,19 +107,24 @@ import {
 } from 'ionicons/icons'
 import { useAuthStore } from '@/features/auth/stores/authStore'
 import { useStatusStore } from '@/features/business-status/stores/statusStore'
+import { useBookingsStore } from '@/features/bookings/stores/bookingsStore'
 import AppHeader from '@/shared/components/AppHeader.vue'
 import PageNavigation from '@/shared/components/PageNavigation.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const statusStore = useStatusStore()
+const bookingsStore = useBookingsStore()
 
 const isAvailable = ref(false)
 
-// Load current status on mount
+// Load current status and bookings on mount
 onMounted(async () => {
   await statusStore.fetchCurrentStatus()
   isAvailable.value = statusStore.status === 'available'
+
+  // Загружаем записи для отображения badge
+  await bookingsStore.fetchBookings()
 })
 
 // Handle status toggle
@@ -177,5 +191,13 @@ ion-card {
   font-size: 1rem;
   font-weight: 500;
   color: var(--ion-color-dark);
+}
+
+/* Bookings Badge */
+.bookings-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 10px;
 }
 </style>
