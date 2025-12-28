@@ -2,6 +2,24 @@ from datetime import datetime, date, time
 from pydantic import BaseModel, ConfigDict
 
 
+class ServiceInBooking(BaseModel):
+    """Minimal service info for booking response."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+
+
+class EmployeeInBooking(BaseModel):
+    """Minimal employee info for booking response."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+
+
 class BookingBase(BaseModel):
     """Base booking schema."""
 
@@ -40,3 +58,7 @@ class Booking(BookingBase):
     came_through_app: bool
     created_at: datetime
     updated_at: datetime
+
+    # Nested objects
+    service: ServiceInBooking | None = None
+    employee: EmployeeInBooking | None = None

@@ -2,6 +2,7 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, and_, delete
+from sqlalchemy.orm import selectinload
 
 from app.core.database import get_db
 from app.api.dependencies import get_current_business_admin
@@ -305,6 +306,12 @@ async def get_bookings(
     if employee_id:
         query = query.where(Booking.employee_id == employee_id)
 
+    # Eager load service and employee relationships
+    query = query.options(
+        selectinload(Booking.service),
+        selectinload(Booking.employee)
+    )
+
     query = query.order_by(Booking.booking_date.desc(), Booking.booking_time.desc()).limit(limit)
 
     result = await db.execute(query)
@@ -322,7 +329,12 @@ async def update_booking(
 ):
     """Update booking status."""
     result = await db.execute(
-        select(Booking).where(
+        select(Booking)
+        .options(
+            selectinload(Booking.service),
+            selectinload(Booking.employee)
+        )
+        .where(
             and_(
                 Booking.id == booking_id,
                 Booking.business_id == current_admin.business_id,
