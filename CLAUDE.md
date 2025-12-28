@@ -187,13 +187,21 @@ npx cap open android   # Открыть в Android Studio
 
 ## Переменные окружения
 
+**ВАЖНО: Используй 127.0.0.1 везде для consistency!**
+
+Почему 127.0.0.1, а не localhost:
+- `localhost` и `127.0.0.1` - разные origins для браузера (CORS fail)
+- `localhost` требует DNS resolution, `127.0.0.1` работает напрямую
+- Best practice 2025: явный `127.0.0.1` избегает проблем с IPv4/IPv6
+- Источник: [localhost vs 127.0.0.1 CORS issues](https://codelucky.com/vite-react-localhost-vs-127-0-0-1-issue/)
+
 **api/.env** (создать из `.env.example`):
 ```bash
-# Database (использовать 127.0.0.1 вместо localhost на Windows)
+# Database (ВСЕГДА 127.0.0.1 для consistency)
 DATABASE_URL=postgresql+asyncpg://lets:lets@127.0.0.1:5433/lets_db
 
-# Redis
-REDIS_URL=redis://localhost:6379/0
+# Redis (ВСЕГДА 127.0.0.1)
+REDIS_URL=redis://127.0.0.1:6379/0
 
 # JWT - ОБЯЗАТЕЛЬНО сгенерировать безопасный ключ!
 # python -c "import secrets; print(secrets.token_urlsafe(32))"
@@ -206,7 +214,9 @@ REFRESH_TOKEN_EXPIRE_DAYS=7
 DGIS_API_KEY=your-2gis-api-key-here
 
 # CORS
-ALLOWED_ORIGINS=http://localhost:5173,http://localhost:5174,http://localhost:3000
+# Development: управляется через settings.allowed_origins_list (127.0.0.1:5173-5175)
+# Production: укажи реальные домены через запятую (https://yourdomain.com,https://www.yourdomain.com)
+ALLOWED_ORIGINS=
 
 # Environment
 ENVIRONMENT=development
@@ -215,12 +225,14 @@ ENVIRONMENT=development
 **business/.env**:
 ```bash
 # ВАЖНО: Business app использует VITE_API_URL (не VITE_API_BASE_URL!)
+# Используй 127.0.0.1 для consistency
 VITE_API_URL=http://127.0.0.1:8000/api/v1
 ```
 
 **consumer/.env**:
 ```bash
-VITE_API_BASE_URL=http://localhost:8000/api/v1
+# Используй 127.0.0.1 для consistency
+VITE_API_BASE_URL=http://127.0.0.1:8000/api/v1
 VITE_DGIS_API_KEY=your-2gis-api-key-here
 ```
 
@@ -235,7 +247,10 @@ VITE_DGIS_API_KEY=your-2gis-api-key-here
 - **Password Hashing:** argon2-cffi (лучше bcrypt для Windows)
 - **Database Enums:** Lowercase значения через `values_callable` (например, "car_wash", не "CAR_WASH")
 - **API Versioning:** Все endpoints под `/api/v1/`
-- **CORS:** Настроен для портов 5173, 5174, 3000, 9000-9002
+- **CORS:** Environment-based конфигурация
+  - Development: автоматически для 127.0.0.1:5173-5175 через `settings.allowed_origins_list`
+  - Production: из переменной окружения `ALLOWED_ORIGINS`
+  - Источник: [FastAPI CORS Best Practices](https://fastapi.tiangolo.com/tutorial/cors/)
 
 **Passwordless Authentication (OTP):**
 - **Для клиентов:** Вход через SMS с одноразовым кодом (без пароля)
@@ -552,15 +567,36 @@ npm run dev  # http://localhost:5174
 - **НЕПРАВИЛЬНО:** `{ ...data, type: data.business_type, business_type: undefined }` - это НЕ удаляет поле!
 - **ПРАВИЛЬНО:** Использовать деструктуризацию для исключения ненужных полей
 
-**CORS Issues:**
-- **РЕШЕНИЕ:** CORS настроен через переменную окружения `ENVIRONMENT`
-- В **development** режиме: разрешены все origins (`allow_origins=["*"]`)
-- В **production** режиме: используются origins из `ALLOWED_ORIGINS` в `.env`
-- **ВАЖНО:** Браузер считает `localhost` и `127.0.0.1` разными origins
-- **DEBUG:** Если CORS ошибка, проверить:
-  1. Что `ENVIRONMENT=development` в `.env`
-  2. Что backend перезагрузился после изменений в main.py
-  3. В production добавить нужные origins в `ALLOWED_ORIGINS`
+**CORS Configuration (Best Practices 2025):**
+- **Environment-based:** автоматическая конфигурация через `settings.allowed_origins_list`
+- **Development:** явно указаны origins `127.0.0.1:5173-5175` в `api/app/core/config.py`
+- **Production:** origins из переменной окружения `ALLOWED_ORIGINS` в `.env`
+- **НИКОГДА НЕ:** `allow_origins=["*"]` с `allow_credentials=True` (не работает по спецификации CORS)
+- **Источники:**
+  - [FastAPI CORS Documentation](https://fastapi.tiangolo.com/tutorial/cors/)
+  - [FastAPI Security Best Practices 2025](https://blog.greeden.me/en/2025/07/29/fastapi-security-best-practices-from-authentication-authorization-to-cors/)
+
+**localhost vs 127.0.0.1:**
+- **КРИТИЧНО:** `localhost` и `127.0.0.1` - РАЗНЫЕ origins для браузера
+- **ВСЕГДА используй:** `127.0.0.1` везде (backend .env, frontend .env, запуск команд)
+- **Почему 127.0.0.1:**
+  - Избегает DNS resolution проблем
+  - Явный IPv4, избегает путаницы с IPv6
+  - Best practice 2025 для development
+- **Источник:** [localhost vs 127.0.0.1 issues](https://codelucky.com/vite-react-localhost-vs-127-0-0-1-issue/)
+
+**Backend Host Configuration:**
+- **Development:** `--host 127.0.0.1` (безопасно, только локальная машина)
+- **Production:** `--host 127.0.0.1` за Nginx reverse proxy
+- **НИКОГДА в development:** `--host 0.0.0.0` (небезопасно, доступ из сети)
+- **Источник:** [Uvicorn host security](https://uvicorn.dev/settings/)
+
+**DEBUG CORS ошибок:**
+1. Проверь что все используют `127.0.0.1` (НЕ `localhost`)
+2. Проверь что backend запущен на `127.0.0.1:8000`
+3. Проверь что frontend .env использует `http://127.0.0.1:8000`
+4. Перезапусти backend и frontend после изменений .env
+5. Очисти кэш браузера (Ctrl+Shift+R)
 
 **Backend поля phones vs phone:**
 - **КРИТИЧНО:** Модель Business имеет поле `phones` (массив JSON), НЕ `phone`

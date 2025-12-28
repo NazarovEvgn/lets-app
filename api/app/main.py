@@ -35,30 +35,15 @@ app = FastAPI(
 )
 
 # Configure CORS
-# In development, allow common localhost ports
-# In production, use ALLOWED_ORIGINS from .env
-if settings.environment == "development":
-    # Explicitly list development origins for debugging
-    cors_origins = [
-        "http://localhost:5173",  # Business app
-        "http://localhost:5174",  # Alternative port
-        "http://localhost:5175",  # Consumer app
-        "http://localhost:8000",  # Backend self-reference
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:5174",
-        "http://127.0.0.1:5175",
-        "http://127.0.0.1:8000",
-    ]
-else:
-    cors_origins = settings.allowed_origins_list
-
+# Origins are managed via settings.allowed_origins_list property
+# Development: predefined 127.0.0.1 origins for dev apps
+# Production: from ALLOWED_ORIGINS environment variable
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=cors_origins,
+    allow_origins=settings.allowed_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["*"],
 )
 
 # Include routers
