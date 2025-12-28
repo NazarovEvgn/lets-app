@@ -1,7 +1,7 @@
 <template>
   <ion-page>
-    <ion-header>
-      <ion-toolbar color="primary">
+    <ion-header class="custom-header">
+      <ion-toolbar class="header-toolbar">
         <!-- Client Profile -->
         <div slot="start" class="profile-header" @click="router.push('/profile')">
           <div class="avatar-small">
@@ -422,11 +422,39 @@ function markAllAsRead() {
 </script>
 
 <style scoped>
+/* Header Container */
+.custom-header {
+  background: #f5f5f5;
+  padding: 12px 16px;
+}
+
+.header-toolbar {
+  --background: #D6D6D6;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  margin: 0;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.header-toolbar::part(native) {
+  border-radius: 16px !important;
+  overflow: hidden !important;
+}
+
+.header-toolbar ion-buttons {
+  margin-right: 0 !important;
+  padding-right: 0 !important;
+}
+
 .profile-header {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 8px 12px;
+  padding: 8px 0;
   cursor: pointer;
   transition: opacity 0.2s;
 }
@@ -440,11 +468,11 @@ function markAllAsRead() {
   height: 44px;
   border-radius: 50%;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(39, 18, 106, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid var(--ion-color-primary);
 }
 
 .avatar-small img {
@@ -455,7 +483,7 @@ function markAllAsRead() {
 
 .avatar-small ion-icon {
   font-size: 40px;
-  color: white;
+  color: var(--ion-color-primary);
 }
 
 .profile-info {
@@ -465,16 +493,17 @@ function markAllAsRead() {
 }
 
 .profile-name {
-  color: white;
+  color: #1a1a1a;
   font-size: 15px;
   font-weight: 600;
   line-height: 1.2;
 }
 
 .profile-link {
-  color: rgba(255, 255, 255, 0.8);
+  color: #1a1a1a;
   font-size: 12px;
   line-height: 1.2;
+  opacity: 0.7;
 }
 
 /* Notifications Button - iOS Style */
@@ -485,7 +514,7 @@ function markAllAsRead() {
 
 .notifications-icon {
   font-size: 28px !important;
-  color: white;
+  color: var(--ion-color-primary) !important;
 }
 
 .notifications-badge {
@@ -503,7 +532,7 @@ function markAllAsRead() {
   justify-content: center;
   background: #FF3B30;
   color: white;
-  border: 2px solid var(--ion-color-primary);
+  border: 2px solid #D6D6D6;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   pointer-events: none;
 }
