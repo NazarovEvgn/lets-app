@@ -28,6 +28,31 @@ const routes: Array<RouteRecordRaw> = [
     name: 'Profile',
     component: () => import('@/features/profile/pages/ProfilePage.vue'),
     meta: { requiresAuth: true }
+  },
+  // Booking flow routes
+  {
+    path: '/booking/business/:businessId',
+    name: 'BookingBusinessDetails',
+    component: () => import('@/features/booking/pages/BusinessDetailsPage.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/booking/select-employee/:businessId/:serviceId',
+    name: 'BookingSelectEmployee',
+    component: () => import('@/features/booking/pages/SelectEmployeePage.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/booking/select-date/:businessId/:serviceId/:employeeId',
+    name: 'BookingSelectDate',
+    component: () => import('@/features/booking/pages/SelectDatePage.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/booking/select-time/:businessId/:serviceId/:employeeId',
+    name: 'BookingSelectTime',
+    component: () => import('@/features/booking/pages/SelectTimePage.vue'),
+    meta: { requiresAuth: true }
   }
 ]
 

@@ -36,3 +36,7 @@ export interface SearchBusinessesParams {
   limit?: number
   offset?: number
 }
+
+// Re-export Service and Employee types
+export type { Service } from './service'
+export type { Employee } from './employee'

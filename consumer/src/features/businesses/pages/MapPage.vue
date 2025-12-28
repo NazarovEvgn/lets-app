@@ -459,9 +459,7 @@ function bookService(business: Business, event?: Event) {
   if (event) {
     event.stopPropagation() // Prevent card click
   }
-  // TODO: Open booking dialog
-  console.log('Book service for:', business.name)
-  selectedBusiness.value = business
+  router.push(`/booking/business/${business.id}`)
 }
 
 function getNotificationIcon(type: string) {
