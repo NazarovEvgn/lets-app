@@ -208,7 +208,8 @@ async def create_service(
         business_id=current_admin.business_id,
         name=service_data.name,
         description=service_data.description,
-        price=service_data.price,
+        price_from=service_data.price_from,
+        price_to=service_data.price_to,
         duration_minutes=service_data.duration_minutes,
     )
 

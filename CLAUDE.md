@@ -553,20 +553,14 @@ npm run dev  # http://localhost:5174
 - **ПРАВИЛЬНО:** Использовать деструктуризацию для исключения ненужных полей
 
 **CORS Issues:**
-- **ПРОБЛЕМА:** Backend слушает на `127.0.0.1:8000`, но frontend делает запросы на `localhost:8000`
-- **РЕШЕНИЕ:** В `api/app/main.py` CORS настроен для обоих вариантов:
-  ```python
-  allow_origins=[
-      "http://localhost:5173",  # Business app
-      "http://localhost:5174",  # Consumer app
-      "http://127.0.0.1:5173",
-      "http://127.0.0.1:5174",
-      "http://localhost:8000",  # Self-referencing
-      "http://127.0.0.1:8000",
-  ]
-  ```
+- **РЕШЕНИЕ:** CORS настроен через переменную окружения `ENVIRONMENT`
+- В **development** режиме: разрешены все origins (`allow_origins=["*"]`)
+- В **production** режиме: используются origins из `ALLOWED_ORIGINS` в `.env`
 - **ВАЖНО:** Браузер считает `localhost` и `127.0.0.1` разными origins
-- **DEBUG:** Если CORS ошибка, проверить что backend перезагрузился после изменений в main.py
+- **DEBUG:** Если CORS ошибка, проверить:
+  1. Что `ENVIRONMENT=development` в `.env`
+  2. Что backend перезагрузился после изменений в main.py
+  3. В production добавить нужные origins в `ALLOWED_ORIGINS`
 
 **Backend поля phones vs phone:**
 - **КРИТИЧНО:** Модель Business имеет поле `phones` (массив JSON), НЕ `phone`

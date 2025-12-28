@@ -115,7 +115,7 @@ const error = ref<string | null>(null)
 function getFullPhotoUrl(photoUrl?: string): string {
   if (!photoUrl) return ''
   if (photoUrl.startsWith('http')) return photoUrl
-  return `${apiConfig.apiUrl.replace('/api/v1', '')}${photoUrl}`
+  return `${apiConfig.apiBaseUrl.replace('/api/v1', '')}${photoUrl}`
 }
 
 async function loadEmployees() {

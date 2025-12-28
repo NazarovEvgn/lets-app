@@ -157,7 +157,7 @@ const error = ref<string | null>(null)
 function getFullLogoUrl(logoUrl?: string): string {
   if (!logoUrl) return ''
   if (logoUrl.startsWith('http')) return logoUrl
-  return `${apiConfig.apiUrl.replace('/api/v1', '')}${logoUrl}`
+  return `${apiConfig.apiBaseUrl.replace('/api/v1', '')}${logoUrl}`
 }
 
 function businessTypeLabel(type: string): string {

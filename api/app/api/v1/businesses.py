@@ -219,7 +219,8 @@ async def get_business_details(
                 "id": s.id,
                 "name": s.name,
                 "description": s.description,
-                "price": s.price,
+                "price_from": s.price_from,
+                "price_to": s.price_to,
                 "duration_minutes": s.duration_minutes,
             }
             for s in services
