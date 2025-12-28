@@ -18,8 +18,14 @@
           </div>
         </div>
 
-        <!-- Notifications Button -->
+        <!-- Favorites and Notifications Buttons -->
         <ion-buttons slot="end">
+          <!-- Favorites Button -->
+          <ion-button id="favorites-trigger" @click="loadFavorites">
+            <ion-icon slot="icon-only" :icon="heartOutline" class="favorites-icon"></ion-icon>
+          </ion-button>
+
+          <!-- Notifications Button -->
           <div class="notifications-button-wrapper">
             <ion-button id="notifications-trigger">
               <ion-icon slot="icon-only" :icon="notificationsOutline" class="notifications-icon"></ion-icon>
@@ -35,7 +41,7 @@
       <div class="search-panel">
         <ion-searchbar
           v-model="searchQuery"
-          placeholder="Поиск по названию (например, Familia)..."
+          placeholder="найти"
           :debounce="500"
           animated
           show-clear-button="focus"
@@ -58,42 +64,110 @@
       </div>
 
       <!-- Business List -->
-      <ion-list v-else>
-        <ion-item
+      <div v-else class="business-list">
+        <ion-card
           v-for="business in businessesStore.businesses"
           :key="business.id"
+          class="business-card-modern"
           button
           @click="selectBusiness(business)"
         >
-          <div class="business-card">
-            <div class="business-header">
-              <div class="business-info">
-                <h3>{{ business.name }}</h3>
-                <p class="business-type">{{ businessTypeLabel(business.business_type) }}</p>
+          <ion-card-content>
+            <div class="card-layout">
+              <!-- Logo/Avatar -->
+              <div class="business-logo">
+                <img
+                  v-if="business.logo_url"
+                  :src="getFullLogoUrl(business.logo_url)"
+                  :alt="business.name"
+                />
+                <div v-else class="logo-placeholder">
+                  {{ business.name.charAt(0).toUpperCase() }}
+                </div>
               </div>
-              <ion-badge :color="statusColor(business.status?.status || 'available')">
-                {{ statusLabel(business.status?.status || 'available') }}
-              </ion-badge>
-            </div>
 
-            <div class="business-details">
-              <div class="detail-row">
-                <ion-icon :icon="locationOutline" color="medium"></ion-icon>
-                <span>{{ business.address }}</span>
+              <!-- Business Info -->
+              <div class="business-content">
+                <h3 class="business-name">{{ business.name }}</h3>
+                <p class="business-type-label">{{ businessTypeLabel(business.business_type) }}</p>
+                <div class="business-meta">
+                  <div class="meta-row">
+                    <ion-icon :icon="locationOutline"></ion-icon>
+                    <span>{{ business.address }}</span>
+                  </div>
+                  <div class="meta-row">
+                    <ion-icon :icon="timeOutline"></ion-icon>
+                    <span>Пн-Вс 9:00-21:00</span>
+                  </div>
+                </div>
               </div>
-              <div class="detail-row">
-                <ion-icon :icon="callOutline" color="medium"></ion-icon>
-                <span>{{ business.phone }}</span>
-              </div>
-              <div v-if="business.status" class="detail-row">
-                <ion-icon :icon="timeOutline" color="medium"></ion-icon>
-                <span>Ожидание: ~{{ business.status.estimated_wait_minutes }} мин</span>
-              </div>
+
+              <!-- Favorite Button -->
+              <ion-button
+                fill="clear"
+                class="favorite-button-card"
+                @click="toggleFavorite(business, $event)"
+              >
+                <ion-icon
+                  slot="icon-only"
+                  :icon="isFavorite(business.id) ? heart : heartOutline"
+                  :class="{ 'favorite-active': isFavorite(business.id) }"
+                ></ion-icon>
+              </ion-button>
             </div>
-          </div>
-        </ion-item>
-      </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </div>
     </ion-content>
+
+    <!-- Favorites Popover -->
+    <ion-popover trigger="favorites-trigger" :dismiss-on-select="true">
+      <ion-content class="favorites-popover">
+        <div class="favorites-header">
+          <h3>Избранное</h3>
+        </div>
+
+        <!-- Favorites List -->
+        <div v-if="favoritesStore.loading" class="loading-container">
+          <ion-spinner name="crescent"></ion-spinner>
+        </div>
+
+        <div v-else-if="favoritesStore.favorites.length > 0" class="favorites-list">
+          <ion-card
+            v-for="business in favoritesStore.favorites"
+            :key="business.id"
+            class="favorite-card-compact"
+            button
+            @click="selectBusiness(business)"
+          >
+            <ion-card-content>
+              <div class="favorite-card-layout">
+                <div class="business-logo-small">
+                  <img
+                    v-if="business.logo_url"
+                    :src="getFullLogoUrl(business.logo_url)"
+                    :alt="business.name"
+                  />
+                  <div v-else class="logo-placeholder-small">
+                    {{ business.name.charAt(0).toUpperCase() }}
+                  </div>
+                </div>
+                <div class="favorite-card-info">
+                  <h4>{{ business.name }}</h4>
+                  <p>{{ businessTypeLabel(business.business_type) }}</p>
+                </div>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </div>
+
+        <!-- Empty State -->
+        <div v-else class="favorites-empty">
+          <ion-icon :icon="heartOutline" size="large"></ion-icon>
+          <p>Нет избранных сервисов</p>
+        </div>
+      </ion-content>
+    </ion-popover>
 
     <!-- Notifications Popover -->
     <ion-popover trigger="notifications-trigger" :dismiss-on-select="true">
@@ -238,18 +312,23 @@ import {
   checkmarkCircleOutline,
   alertCircleOutline,
   informationCircleOutline,
+  heartOutline,
+  heart,
 } from 'ionicons/icons'
 import { useBusinessesStore } from '../stores/businessesStore'
 import { useProfileStore } from '@/features/profile/stores/profileStore'
+import { useFavoritesStore } from '@/features/favorites/stores/favoritesStore'
 import type { Business, BusinessType, BusinessStatus } from '../types'
 import { API_BASE_URL } from '@/core/config'
 
 const router = useRouter()
 const businessesStore = useBusinessesStore()
 const profileStore = useProfileStore()
+const favoritesStore = useFavoritesStore()
 
 const searchQuery = ref('')
 const selectedBusiness = ref<Business | null>(null)
+const showFavorites = ref(false)
 
 // Notifications state
 interface Notification {
@@ -325,6 +404,9 @@ onMounted(async () => {
 
   // Load businesses
   await loadBusinesses()
+
+  // Load favorites
+  await favoritesStore.fetchFavorites()
 })
 
 function getFullAvatarUrl(avatarUrl: string | null): string {
@@ -332,6 +414,13 @@ function getFullAvatarUrl(avatarUrl: string | null): string {
   // Remove /api/v1 from base URL and append avatar URL
   const baseUrl = API_BASE_URL.replace('/api/v1', '')
   return `${baseUrl}${avatarUrl}`
+}
+
+function getFullLogoUrl(logoUrl: string | null): string {
+  if (!logoUrl) return ''
+  // Remove /api/v1 from base URL and append logo URL
+  const baseUrl = API_BASE_URL.replace('/api/v1', '')
+  return `${baseUrl}${logoUrl}`
 }
 
 function selectBusiness(business: Business) {
@@ -418,6 +507,24 @@ function handleNotificationClick(notification: Notification) {
 
 function markAllAsRead() {
   notifications.value.forEach(n => n.read = true)
+}
+
+async function toggleFavorite(business: Business, event: Event) {
+  event.stopPropagation() // Prevent card click
+
+  if (favoritesStore.isFavorite(business.id)) {
+    await favoritesStore.removeFromFavorites(business.id)
+  } else {
+    await favoritesStore.addToFavorites(business.id)
+  }
+}
+
+function isFavorite(businessId: number): boolean {
+  return favoritesStore.isFavorite(businessId)
+}
+
+async function loadFavorites() {
+  await favoritesStore.fetchFavorites()
 }
 </script>
 
@@ -522,7 +629,12 @@ ion-header::after {
   opacity: 0.7;
 }
 
-/* Notifications Button - iOS Style */
+/* Header Action Buttons - iOS Style */
+.favorites-icon {
+  font-size: 28px !important;
+  color: var(--ion-color-primary) !important;
+}
+
 .notifications-button-wrapper {
   position: relative;
   display: inline-block;
@@ -595,46 +707,141 @@ ion-header::after {
   font-size: 64px;
 }
 
-.business-card {
-  width: 100%;
-  padding: 12px 0;
-}
-
-.business-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.business-info h3 {
-  margin: 0 0 4px 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-}
-
-.business-type {
-  margin: 0;
-  font-size: 0.9rem;
-  color: var(--ion-color-medium);
-}
-
-.business-details {
+/* Business List Container */
+.business-list {
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 }
 
-.detail-row {
+/* Modern Business Card */
+.business-card-modern {
+  margin: 0;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+}
+
+.business-card-modern:hover {
+  box-shadow: 0 4px 12px rgba(39, 18, 106, 0.15);
+  transform: translateY(-2px);
+}
+
+.business-card-modern ion-card-content {
+  padding: 16px;
+}
+
+.card-layout {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  position: relative;
+}
+
+/* Business Logo */
+.business-logo {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--ion-color-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.business-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.logo-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--ion-color-primary);
+  background: rgba(39, 18, 106, 0.1);
+}
+
+/* Business Content */
+.business-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.business-name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+  line-height: 1.3;
+  font-family: 'Tilda Sans', -apple-system, system-ui, sans-serif;
+}
+
+.business-type-label {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ion-color-medium);
+  line-height: 1.2;
+  font-family: 'Tilda Sans', -apple-system, system-ui, sans-serif;
+}
+
+/* Business Meta */
+.business-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.meta-row {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.95rem;
+  font-size: 13px;
+  color: var(--ion-color-medium);
 }
 
-.detail-row ion-icon {
-  font-size: 18px;
+.meta-row ion-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  color: var(--ion-color-primary);
+}
+
+.meta-row span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Favorite Button in Card */
+.favorite-button-card {
+  position: absolute;
+  top: 0;
+  right: 0;
+  --padding-start: 8px;
+  --padding-end: 8px;
+  margin: 0;
+}
+
+.favorite-button-card ion-icon {
+  font-size: 24px;
+  color: var(--ion-color-primary);
+}
+
+.favorite-button-card .favorite-active {
+  color: var(--ion-color-primary);
 }
 
 .modal-detail-row {
@@ -778,5 +985,126 @@ ion-header::after {
   margin: 0;
   color: var(--ion-color-medium);
   font-size: 16px;
+}
+
+/* Favorites Popover */
+.favorites-popover {
+  --width: 360px;
+  --max-height: 500px;
+}
+
+.favorites-header {
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid var(--ion-color-light);
+}
+
+.favorites-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ion-color-dark);
+  font-family: 'Tilda Sans', -apple-system, system-ui, sans-serif;
+}
+
+.favorites-list {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.favorite-card-compact {
+  margin: 0;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.favorite-card-compact ion-card-content {
+  padding: 12px;
+}
+
+.favorite-card-layout {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.business-logo-small {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--ion-color-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.business-logo-small img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.logo-placeholder-small {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ion-color-primary);
+  background: rgba(39, 18, 106, 0.1);
+  font-family: 'Tilda Sans', -apple-system, system-ui, sans-serif;
+}
+
+.favorite-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.favorite-card-info h4 {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ion-color-dark);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: 'Tilda Sans', -apple-system, system-ui, sans-serif;
+}
+
+.favorite-card-info p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ion-color-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: 'Tilda Sans', -apple-system, system-ui, sans-serif;
+}
+
+.favorites-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  gap: 16px;
+}
+
+.favorites-empty ion-icon {
+  font-size: 64px;
+  color: var(--ion-color-medium);
+  opacity: 0.5;
+}
+
+.favorites-empty p {
+  margin: 0;
+  color: var(--ion-color-medium);
+  font-size: 16px;
+  font-family: 'Tilda Sans', -apple-system, system-ui, sans-serif;
 }
 </style>
