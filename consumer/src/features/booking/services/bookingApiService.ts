@@ -16,8 +16,7 @@ export const bookingApiService = {
    * Get all services for a business
    */
   async getBusinessServices(businessId: number): Promise<Service[]> {
-    // TODO: Update endpoint when backend is ready
-    const response = await apiClient.get(`/admin/services?business_id=${businessId}`)
+    const response = await apiClient.get(`/businesses/${businessId}/services`)
     return response.data
   },
 
@@ -25,12 +24,7 @@ export const bookingApiService = {
    * Get all employees for a business (filtered by service if provided)
    */
   async getBusinessEmployees(businessId: number, serviceId?: number): Promise<Employee[]> {
-    // TODO: Update endpoint when backend is ready
-    let url = `/admin/employees?business_id=${businessId}`
-    if (serviceId) {
-      url += `&service_id=${serviceId}`
-    }
-    const response = await apiClient.get(url)
+    const response = await apiClient.get(`/businesses/${businessId}/employees`)
     return response.data
   },
 

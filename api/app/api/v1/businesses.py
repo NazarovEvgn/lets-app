@@ -9,11 +9,13 @@ from app.api.dependencies import get_current_user
 from app.models.user import User
 from app.models.business import Business, BusinessStatus, BusinessType, BusinessHours
 from app.models.service import Service
+from app.models.employee import Employee
 from app.models.promotion import Promotion
 from app.models.favorite import Favorite
 from app.models.booking import Booking
 from app.schemas.business import Business as BusinessSchema
 from app.schemas.service import Service as ServiceSchema
+from app.schemas.employee import Employee as EmployeeSchema
 from app.schemas.promotion import Promotion as PromotionSchema
 from app.schemas.available_slots import AvailableSlotsResponse, TimeSlot
 
@@ -127,7 +129,7 @@ async def get_nearby_businesses(
             "address": business.address,
             "lat": business.lat,
             "lon": business.lon,
-            "phone": business.phone,
+            "phone": business.phones[0] if business.phones else "",
             "description": business.description,
             "logo_url": business.logo_url,
         }
@@ -201,7 +203,7 @@ async def get_business_details(
         "address": business.address,
         "lat": business.lat,
         "lon": business.lon,
-        "phone": business.phone,
+        "phone": business.phones[0] if business.phones else "",
         "email": business.email,
         "description": business.description,
         "logo_url": business.logo_url,
@@ -249,6 +251,21 @@ async def get_business_services(
     )
     services = result.scalars().all()
     return services
+
+
+@router.get("/{business_id}/employees", response_model=list[EmployeeSchema])
+async def get_business_employees(
+    business_id: int,
+    db: AsyncSession = Depends(get_db),
+):
+    """Get all active employees for a business."""
+    result = await db.execute(
+        select(Employee).where(
+            and_(Employee.business_id == business_id, Employee.is_active == True)
+        )
+    )
+    employees = result.scalars().all()
+    return employees
 
 
 @router.get("/{business_id}/promotions", response_model=list[PromotionSchema])
