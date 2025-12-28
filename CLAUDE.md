@@ -120,9 +120,14 @@ cp .env.example .env
 # Отредактировать .env (DATABASE_URL, SECRET_KEY, DGIS_API_KEY)
 
 # Запуск dev сервера
-cd api
-uv run uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+# ПРАВИЛЬНАЯ команда с cd && (обязательно!):
+cd api && .venv/Scripts/python.exe -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+
+# Альтернатива с uv:
+cd api && uv run uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+
 # API docs: http://localhost:8000/docs
+# ВАЖНО: НЕ разделяй cd и uvicorn на отдельные команды!
 
 # Миграции БД
 cd api
@@ -141,6 +146,7 @@ uv run black .        # Форматирование
 - Используй `127.0.0.1` вместо `localhost` в DATABASE_URL на Windows
 - Проверяй автогенерированные миграции для Enum (должны использовать lowercase значения)
 - КРИТИЧНО: Директория `api/uploads/` должна существовать! Создай её: `mkdir -p api/uploads`
+- Docker контейнеры называются `lets_postgres` и `lets_redis` - проверяй статус через `docker ps`
 
 ### Frontend - Business App (business/)
 
@@ -149,7 +155,10 @@ cd business
 npm install
 npm run dev      # Dev server на http://localhost:5173
 npm run build    # Production build
+npm run preview  # Preview production build
 npm run lint     # ESLint
+npm run test:unit  # Run unit tests (Vitest)
+npm run test:e2e   # Run E2E tests (Cypress)
 ```
 
 ### Frontend - Consumer App (consumer/)
@@ -159,6 +168,10 @@ cd consumer
 npm install
 npm run dev      # Dev server на http://localhost:5174 (другой порт!)
 npm run build    # Production build
+npm run preview  # Preview production build
+npm run lint     # ESLint
+npm run test:unit  # Run unit tests (Vitest)
+npm run test:e2e   # Run E2E tests (Cypress)
 
 # Capacitor (PWA + native)
 npx cap sync           # Синхронизация с native платформами
@@ -412,6 +425,8 @@ Pinia ДОЛЖНА быть инициализирована ДО роутера
 
 ## Быстрый старт
 
+**ВАЖНО: ВСЕГДА используй эти точные команды для запуска!**
+
 **1. Запустить Docker сервисы:**
 ```bash
 docker-compose up -d
@@ -420,15 +435,19 @@ docker ps  # Проверка: lets_postgres (healthy), lets_redis (healthy)
 
 **2. Создать директорию для загрузки фото (если её нет):**
 ```bash
-cd api
-mkdir -p uploads
+mkdir -p api/uploads
 ```
 
 **3. Запустить backend API:**
 ```bash
-cd api
-uv run uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+# КРИТИЧЕСКИ ВАЖНО: Используй команду с cd && для правильной загрузки .env
+cd api && .venv/Scripts/python.exe -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+
+# Альтернатива (если есть uv):
+cd api && uv run uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+
 # API docs: http://localhost:8000/docs
+# НЕ используй python без cd api &&, иначе .env не загрузится!
 ```
 
 **4. Запустить frontend (выбрать нужное):**
@@ -458,11 +477,13 @@ npm run dev  # http://localhost:5174
 ## Типичные проблемы и решения
 
 **Запуск Backend API:**
-- **ПРАВИЛЬНАЯ КОМАНДА:** `cd api && uv run uvicorn app.main:app --reload --host 127.0.0.1 --port 8000`
-- Или альтернативная: `cd api && .venv/Scripts/python.exe -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000`
+- **ЕДИНСТВЕННАЯ ПРАВИЛЬНАЯ КОМАНДА:** `cd api && .venv/Scripts/python.exe -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000`
+- **АЛЬТЕРНАТИВА (с uv):** `cd api && uv run uvicorn app.main:app --reload --host 127.0.0.1 --port 8000`
+- **КРИТИЧНО:** ВСЕГДА используй `cd api &&` в начале команды! Без этого .env файл не загрузится и будут ошибки валидации
+- **КРИТИЧНО:** НЕ используй абсолютные пути типа `C:/Projects/lets-app/api/.venv/Scripts/python.exe` без cd - это НЕ работает!
 - **ВАЖНО:** Всегда использовать `127.0.0.1`, не `localhost` на Windows
-- **ВАЖНО:** Всегда запускать из директории `api/`
-- Проверить, что Docker сервисы запущены: `docker ps` (postgres на 5433, redis на 6379)
+- **ВАЖНО:** Сначала проверить Docker: `docker ps` (postgres на 5433, redis на 6379)
+- Если контейнеры не запущены: `docker-compose up -d`
 
 **Проблема с загрузкой фото:**
 - КРИТИЧЕСКИ ВАЖНО: Директория `api/uploads/` ДОЛЖНА существовать для работы загрузки фото
@@ -599,8 +620,9 @@ npm run dev  # http://localhost:5174
 
 - `docs/dev_concept.md` - Бизнес концепция (на русском)
 - `docs/dev_plan.md` - План разработки (на русском)
-- `README.md` - Общее описание проекта
+- `README.md` - Общее описание проекта (устарел, ссылается на старую архитектуру Quasar)
 - API docs: http://localhost:8000/docs (когда запущен backend)
+- ReDoc: http://localhost:8000/redoc (альтернативная документация API)
 
 ## Важные файлы для резервного копирования
 

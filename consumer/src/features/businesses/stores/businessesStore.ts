@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { businessesApiService } from '../services/businessesApiService'
-import type { Business, BusinessType, NearbyBusinessesParams } from '../types'
+import type { Business, BusinessType, NearbyBusinessesParams, SearchBusinessesParams } from '../types'
 
 export const useBusinessesStore = defineStore('businesses', () => {
   const businesses = ref<Business[]>([])
@@ -23,6 +23,21 @@ export const useBusinessesStore = defineStore('businesses', () => {
     }
   }
 
+  async function search(params: SearchBusinessesParams): Promise<void> {
+    loading.value = true
+    error.value = null
+
+    try {
+      const data = await businessesApiService.search(params)
+      businesses.value = data
+    } catch (err: any) {
+      error.value = err.response?.data?.detail || 'Failed to search businesses'
+      console.error('[BusinessesStore] search error:', err)
+    } finally {
+      loading.value = false
+    }
+  }
+
   function filterByType(type: BusinessType | null): Business[] {
     if (!type) return businesses.value
     return businesses.value.filter(b => b.business_type === type)
@@ -33,6 +48,7 @@ export const useBusinessesStore = defineStore('businesses', () => {
     loading,
     error,
     fetchNearby,
+    search,
     filterByType,
   }
 })

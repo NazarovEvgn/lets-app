@@ -4,7 +4,7 @@ import { RouteRecordRaw } from 'vue-router'
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    redirect: '/map'
+    redirect: '/home'
   },
   {
     path: '/login',
@@ -12,14 +12,16 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/features/auth/pages/LoginPage.vue')
   },
   {
-    path: '/map',
-    name: 'Map',
-    component: () => import('@/features/businesses/pages/MapPage.vue')
+    path: '/home',
+    name: 'Home',
+    component: () => import('@/features/businesses/pages/MapPage.vue'),
+    meta: { requiresAuth: true }
   },
   {
     path: '/favorites',
     name: 'Favorites',
-    component: () => import('@/features/businesses/pages/FavoritesPage.vue')
+    component: () => import('@/features/businesses/pages/FavoritesPage.vue'),
+    meta: { requiresAuth: true }
   },
   {
     path: '/profile',

@@ -1,7 +1,15 @@
 import { apiClient } from '@/core/api/client'
-import type { Business, NearbyBusinessesParams } from '../types'
+import type { Business, NearbyBusinessesParams, SearchBusinessesParams } from '../types'
 
 export const businessesApiService = {
+  /**
+   * Search businesses by query
+   */
+  async search(params: SearchBusinessesParams): Promise<Business[]> {
+    const response = await apiClient.get<Business[]>('/businesses', { params })
+    return response.data
+  },
+
   /**
    * Get nearby businesses
    */

@@ -229,7 +229,7 @@ async function handleDevLogin() {
 
   if (result.success) {
     // Редирект на главную страницу клиента
-    await router.push('/map')
+    await router.push('/home')
   } else {
     clientError.value = result.error || 'Ошибка входа'
   }
@@ -445,8 +445,8 @@ ion-input {
 .business-header::part(native) {
   display: flex;
   align-items: center;
-  padding-top: 0;
-  padding-bottom: 0;
+  padding: 0 16px !important;
+  height: 56px;
 }
 
 .business-header ion-label {
@@ -454,7 +454,7 @@ ion-input {
   align-items: center;
   margin: 0 !important;
   padding: 0 !important;
-  height: 100%;
+  height: 56px;
 }
 
 .business-header ion-label h3 {
@@ -464,11 +464,16 @@ ion-input {
   font-size: 0.95rem;
   color: var(--ion-color-dark);
   font-family: 'Tilda Sans', -apple-system, system-ui, sans-serif;
-  line-height: 1.2;
+  line-height: 56px;
 }
 
 .business-content {
   background: rgba(255, 255, 255, 0.95);
+}
+
+.business-content ion-item {
+  --min-height: 56px;
+  height: 56px;
 }
 
 .register-link-container {

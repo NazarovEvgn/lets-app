@@ -35,11 +35,13 @@
       <div class="search-panel">
         <ion-searchbar
           v-model="searchQuery"
-          placeholder="Поиск по названию или адресу..."
-          :debounce="300"
+          placeholder="Поиск по названию (например, Familia)..."
+          :debounce="500"
           animated
           show-clear-button="focus"
           class="custom-searchbar"
+          @ionInput="handleSearch"
+          @ionClear="handleClear"
         ></ion-searchbar>
       </div>
 
@@ -49,15 +51,16 @@
       </div>
 
       <!-- Empty State -->
-      <div v-else-if="filteredBusinesses.length === 0" class="empty-state">
+      <div v-else-if="businessesStore.businesses.length === 0" class="empty-state">
         <ion-icon :icon="businessOutline" size="large" color="medium"></ion-icon>
-        <p>Нет доступных бизнесов</p>
+        <p v-if="searchQuery">Ничего не найдено</p>
+        <p v-else>Нет доступных бизнесов</p>
       </div>
 
       <!-- Business List -->
       <ion-list v-else>
         <ion-item
-          v-for="business in filteredBusinesses"
+          v-for="business in businessesStore.businesses"
           :key="business.id"
           button
           @click="selectBusiness(business)"
@@ -289,33 +292,39 @@ const unreadNotifications = computed(() => {
   return notifications.value.filter(n => !n.read).length
 })
 
-const filteredBusinesses = computed(() => {
-  let businesses = businessesStore.businesses
-
-  // Фильтрация по поисковому запросу
+async function handleSearch() {
   if (searchQuery.value.trim()) {
-    const query = searchQuery.value.toLowerCase().trim()
-    businesses = businesses.filter(
-      (b) =>
-        b.name.toLowerCase().includes(query) ||
-        b.address.toLowerCase().includes(query) ||
-        businessTypeLabel(b.business_type).toLowerCase().includes(query)
-    )
+    // Search by query
+    await businessesStore.search({
+      search: searchQuery.value,
+      limit: 50,
+    })
+  } else {
+    // Load all businesses if search is empty
+    await loadBusinesses()
   }
+}
 
-  return businesses
-})
+async function handleClear() {
+  searchQuery.value = ''
+  await loadBusinesses()
+}
 
-onMounted(async () => {
-  // Load user profile
-  await profileStore.fetchProfile()
-
+async function loadBusinesses() {
   // Load businesses near Tyumen center
   await businessesStore.fetchNearby({
     latitude: 57.1522,
     longitude: 65.5343,
     radius_km: 10,
   })
+}
+
+onMounted(async () => {
+  // Load user profile
+  await profileStore.fetchProfile()
+
+  // Load businesses
+  await loadBusinesses()
 })
 
 function getFullAvatarUrl(avatarUrl: string | null): string {

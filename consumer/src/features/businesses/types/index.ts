@@ -29,3 +29,10 @@ export interface NearbyBusinessesParams {
   radius_km?: number
   business_type?: BusinessType
 }
+
+export interface SearchBusinessesParams {
+  search?: string
+  business_type?: BusinessType
+  limit?: number
+  offset?: number
+}
